@@ -1,0 +1,12 @@
+trigger:
+- develop
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- script: yarn install
+  displayName: 'Yarn install'
+
+- script: npm run build
+  displayName: 'Build'
