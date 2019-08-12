@@ -219,11 +219,70 @@ The `ItemLink` object type has these fields:
 
 ### Taxonomy objects
 
-TODO
+Taxonomy terms are available by querying against object types named using the codename of the [taxonomy group](https://docs.kenticocloud.com/tutorials/set-up-projects/define-content-models/organizing-your-content-with-taxonomies) they belong to converted to pascal case, and prefixed with "Taxonomy". For example:
 
-#### Taxonomy routing
+* Given the taxonomy group codename `tag`, the object type will be named `TaxonomyTag`
+* Given the taxonomy group codename `article_topics`, the object type will be named `TaxonomyArticleTopics`
 
-TODO
+🙋 See the section on [configuration](#configuration) for options on how to customise naming of taxonomy object types.
+
+#### Taxonomy term fields
+
+Taxonomy term object types share a core set of fields that include:
+
+* System fields provided by the Kentico Cloud delivery client
+* Fields required by this plugin
+* Fields required by Gridsome
+
+As such, every taxonomy term object has the following fields:
+
+| Name | Type | Notes |
+| --- | --- | --- |
+| `id` | `String` | The codename of the taxonomy term in Kentico Cloud is used as the object's id |
+| `name` | `String` | The name of the taxonomy term in Kentico Cloud |
+| `slug` | `String` | A slug is generated so that it can be used when specifying [routes](#taxonomy-routing) for object types |
+| `terms` | `<Taxonomy>[]` | Taxonomy terms can have child terms, which are an array of references to [taxonomy objects](#taxonomy-objects) |
+| `path` | `String` | If a [route](#taxonomy-routing) has been specified for this taxonomy object type Gridsome will generate a path for each object belonging to that type; otherwise the path will be `undefined` |
+
+#### Working with Taxonomy in Gridsome
+
+The Gridsome documentation describes how to [create a taxonomy page](https://gridsome.org/docs/taxonomies) template to display a `Tag` object and the `Post` objects that reference that `Tag`.
+
+To achieve this with the Kentico Cloud plugin you will need to ensure that you set up [routing](#taxonomy-routing) for the taxonomy group that you want to list (i.e. your equivalent of `Tag`).
+
+> The plugin will take care of adding the required references between [Taxonomy objects](#taxonomy-objects) and [Content objects](#content-objects) (i.e. your equivalent of `Post`) via any [Taxonomy content elements](#content-element-fields) defined on the the Content object's content type in Kentico Cloud.
+
+To do the inverse of what is documented and create a template to display a `Post` object and the `Tag` objects that the `Post` references, you can use a query like the below:
+
+```graphql
+query Post ($id: String!) {
+  post (id: $id) {
+    title,
+    tags {
+      name,
+      path
+    }
+  }
+}
+```
+
+And if you wanted to list all `Tag` objects including a count of how many `Post` objects reference each tag, you can use a query like the below:
+
+```graphql
+query Tags {
+  tags: allTag {
+    edges {
+      node {
+        name,
+        path,
+        belongsTo {
+          totalCount
+        }
+      }
+    }
+  }
+}
+```
 
 ### Asset objects
 
@@ -247,7 +306,7 @@ The recommended way to render child components, links and assets embedded in Ric
 
 ## Routing
 
-TODO
+The Kentico Cloud plugin will add routes for all [content types](#content-routing) in your project, and can optionally add routes for [taxonomy groups](#taxonomy-routing).
 
 #### Content routing
 
@@ -282,13 +341,41 @@ It is possible to override the default route for each of your Kentico Cloud cont
   }
 ```
 
-The route that you specify can use any [parameters](https://gridsome.org/docs/routing#route-params) that Gridsome can resolve.
+> The route that you specify can use any [parameters](https://gridsome.org/docs/routing#route-params) that Gridsome can resolve.
 
 > Routes are not resolved in any particular order so you may wish to avoid setting a route such as `/:slug` as this could take precedence and conflict with other routes such as the route for `author` in the above example.
 
 ### Taxonomy routing
 
-TODO
+There is no routing of Taxonomy objects by default.
+
+To define a route for a Kentico Cloud taxonomy group you must use the options exposed by this plugin. To do so you must add an item to the `taxonomyConfig.routes` object with a key matching the taxonomy group codename you wish to specify the route for, and a value matching the desired route that you wish to use for that taxonomy group. For example:
+
+```javascript
+  plugins: [
+    {
+      use: '@meeg/gridsome-source-kentico-cloud',
+      options: {
+        ...
+        taxonomyConfig: {
+          ...
+          routes: {
+            tags: '/tags/:slug'
+          }
+          ...
+        }
+        ...
+      }
+    }
+  }
+```
+
+> The route that you specify can use any [parameters](https://gridsome.org/docs/routing#route-params) that Gridsome can resolve.
+
+The `slug` field is added to each taxonomy term object by this plugin and is generated like so:
+
+* The `codename` of the taxonomy term is [slugified](https://github.com/sindresorhus/slugify)
+* If the term belongs to a "parent" term, the parent's slug is prepended to the current term's slug in the format `{parent-slug}/{slug}`
 
 ## Configuration
 
