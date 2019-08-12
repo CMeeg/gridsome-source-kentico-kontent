@@ -102,12 +102,11 @@ From this point on you are ready to work with your Kentico Cloud content as data
 
 🙋 Please keep reading for a more in-depth discussion of the features of this plugin, including descriptions of:
 
-* The object types and object models added to the [GraphQL schema](#kentico-cloud-graphql-schema) by this plugin, and how to customise certain aspects of:
-  * [Content objects](#content-objects)
-  * [Taxonomy objects](#taxonomy-objects)
-  * [Asset objects](#asset-objects)
-* How to [transform Asset URLs](#transform-asset-urls-in-graphql-queries) directly in GraphQL queries
+* The object types and object models added to the [GraphQL schema](#kentico-cloud-graphql-schema) by this plugin
 * How to [render Rich Text fields](#rendering-rich-text-fields) using Vue single file components that you define in your app
+* How to [customise routing](#routing) of content and taxonomy objects
+* How to work with [Taxonomy](#working-with-taxonomy-in-gridsome) in Gridsome
+* How to work with [Assets](#working-with-assets-in-gridsome) in Gridsome and transform Asset URLs directly in your GraphQL queries
 * How to [create content models](#creating-content-models) to allow you to customise how content from Kentico Cloud is represented in the GraphQL schema
 * The full list of plugin [configuration options](#configuration)
 
@@ -244,65 +243,39 @@ As such, every taxonomy term object has the following fields:
 | `terms` | `<Taxonomy>[]` | Taxonomy terms can have child terms, which are an array of references to [taxonomy objects](#taxonomy-objects) |
 | `path` | `String` | If a [route](#taxonomy-routing) has been specified for this taxonomy object type Gridsome will generate a path for each object belonging to that type; otherwise the path will be `undefined` |
 
-#### Working with Taxonomy in Gridsome
-
-The Gridsome documentation describes how to [create a taxonomy page](https://gridsome.org/docs/taxonomies) template to display a `Tag` object and the `Post` objects that reference that `Tag`.
-
-To achieve this with the Kentico Cloud plugin you will need to ensure that you set up [routing](#taxonomy-routing) for the taxonomy group that you want to list (i.e. your equivalent of `Tag`).
-
-> The plugin will take care of adding the required references between [Taxonomy objects](#taxonomy-objects) and [Content objects](#content-objects) (i.e. your equivalent of `Post`) via any [Taxonomy content elements](#content-element-fields) defined on the the Content object's content type in Kentico Cloud.
-
-To do the inverse of what is documented and create a template to display a `Post` object and the `Tag` objects that the `Post` references, you can use a query like the below:
-
-```graphql
-query Post ($id: String!) {
-  post (id: $id) {
-    title,
-    tags {
-      name,
-      path
-    }
-  }
-}
-```
-
-And if you wanted to list all `Tag` objects including a count of how many `Post` objects reference each tag, you can use a query like the below:
-
-```graphql
-query Tags {
-  tags: allTag {
-    edges {
-      node {
-        name,
-        path,
-        belongsTo {
-          totalCount
-        }
-      }
-    }
-  }
-}
-```
+🙋 For some examples of how taxonomy can be used in Gridsome, please see the section on [working with taxonomy](#working-with-taxonomy-in-gridsome).
 
 ### Asset objects
 
-TODO
+[Assets](https://docs.kenticocloud.com/tutorials/write-and-collaborate/manage-assets/viewing-all-your-project-s-assets) are available by querying against an object type named `Asset`.
 
-#### Transform asset URLs in GraphQL queries
+🙋 See the section on [configuration](#configuration) for options on how to customise naming of the asset object type.
 
-TODO
+#### Asset fields
 
-## Creating content models
+Every asset object has the following fields provided by the Kentico Cloud delivery client:
 
-TODO
+| Name | Type | Notes |
+| --- | --- | --- |
+| `id` | `String` | The URL of the asset is used as the object's id |
+| `type` | `String` | MIME type of the asset  |
+| `size` | `Number` | Size of the asset in bytes |
+| `description` | `String` | Description of the asset |
+| `url` | `String` | Absolute URL of the asset - this field accepts arguments allowing you to [transform image URLs](#working-with-assets-in-gridsome) directly in your GraphQL queries |
+| `width` | `Number` | Width of the image in pixels, if the asset is an image |
+| `height` | `Number` | Height of the image in pixels, if the asset is an image |
 
-The majority of the work required to translate content elements to GraphQL fields is performed via custom `ContentItem` [models](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#creating-models) that are automatically passed to the delivery client as [type resolvers](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#initializing-deliveryclient).
+🙋 For some examples of how assets can be used in Gridsome, please see the section on [working with assets](#working-with-assets-in-gridsome).
 
 ## Rendering Rich Text fields
 
 TODO
 
 The recommended way to render child components, links and assets embedded in Rich Text fields when using this plugin is to write your own Vue components that you define in your Gridsome app. It is recommended because it is idiomatic of a Vue component to render components in this way, and preferred to embedding HTML markup into [delivery client](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#resolving-content-items-and-components-in-rich-text-elements) requests or `[ContentItem](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#url-slugs-links)` classes.
+
+### Opting-out of this approach
+
+TODO
 
 ## Routing
 
@@ -376,6 +349,96 @@ The `slug` field is added to each taxonomy term object by this plugin and is gen
 
 * The `codename` of the taxonomy term is [slugified](https://github.com/sindresorhus/slugify)
 * If the term belongs to a "parent" term, the parent's slug is prepended to the current term's slug in the format `{parent-slug}/{slug}`
+
+## Working with Taxonomy in Gridsome
+
+The Gridsome documentation describes how to [create a taxonomy page](https://gridsome.org/docs/taxonomies) template to display a `Tag` object and the `Post` objects that reference that `Tag`.
+
+To achieve this with the Kentico Cloud plugin you will need to ensure that you set up [routing](#taxonomy-routing) for the taxonomy group that you want to list (i.e. your equivalent of `Tag`).
+
+> The plugin will take care of adding the required references between [Taxonomy objects](#taxonomy-objects) and [Content objects](#content-objects) (i.e. your equivalent of `Post`) via any [Taxonomy content elements](#content-element-fields) defined on the the Content object's content type in Kentico Cloud.
+
+To do the inverse of what is documented and create a template to display a `Post` object and the `Tag` objects that the `Post` references, you can use a query like the below:
+
+```graphql
+query Post ($id: String!) {
+  post (id: $id) {
+    title,
+    tags {
+      name,
+      path
+    }
+  }
+}
+```
+
+And if you wanted to list all `Tag` objects including a count of how many `Post` objects reference each tag, you can use a query like the below:
+
+```graphql
+query Tags {
+  tags: allTag {
+    edges {
+      node {
+        name,
+        path,
+        belongsTo {
+          totalCount
+        }
+      }
+    }
+  }
+}
+```
+
+## Working with Assets in Gridsome
+
+Assets are represented by the `Asset` object type in the Gridsome GraphQL schema and working with assets is largely the same as working with any other object type. The only "special" thing about `Asset` objects is that the `url` field accepts arguments that allow you to specify [image transformations](#https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#image-transformations) via a custom [field resolver](https://gridsome.org/docs/data-store-api#collectionaddschemafieldfieldname-fn) that uses the `ImageUrlBuilder` class provided by the Kentico Cloud delivery client.
+
+The arguments accepted are (omit any of the arguments if you do not wish to use it):
+
+| Name | Type | Equivalent `ImageUrlBuilder` method name | Notes |
+| --- | --- | --- | --- |
+| `width` | `Int` | `withWidth` | Specify the desired width in pixels |
+| `height` | `Int` | `withHeight` | Specify the desired height in pixels |
+| `automaticFormat` | `Boolean` | `withAutomaticFormat` | `true` if you wish to automatically use `webp` format, and fallback to the asset's source format |
+| `format` | `String` | `withFormat` | Accepts any of these values: `gif`, `jpg`, `jpeg`, `pjpg`, `pjpeg`, `png`, `png8`, `webp` |
+| `lossless` | `Boolean` | `withCompression` | If `true` use lossless compression; if `false` use lossy compression |
+| `quality` | `Int` | `withQuality` | Specify a value in the range of 0 to 100 |
+| `dpr` | `Int` | `withDpr` | Specify a value in the range of 1 to 5 |
+
+> There are currently no arguments that are equivalent to the following methods of the `ImageUrlBuilder`:
+> * `withCustomParam`
+> * `withRectangleCrop`
+> * `withFocalPointCrop`
+> * `withFitMode`
+
+You can use it in a GraphQL query like the below:
+
+```graphql
+query Assets {
+  assets: allAsset {
+    edges {
+      node {
+        id,
+        name,
+        url(width: 1200, format: "webp"),
+        placeholderUrl: url(width: 50, format: "webp"), # You can use aliases and supply different arguments to fetch multiple transformed URLs per query
+        type,
+        size,
+        description,
+        width,
+        height
+      }
+    }
+  }
+}
+```
+
+## Creating content models
+
+TODO
+
+The majority of the work required to translate content elements to GraphQL fields is performed via custom `ContentItem` [models](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#creating-models) that are automatically passed to the delivery client as [type resolvers](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#initializing-deliveryclient).
 
 ## Configuration
 
