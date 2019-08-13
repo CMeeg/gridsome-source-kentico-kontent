@@ -83,6 +83,25 @@ export default {
       type: String,
       required: true
     }
+  },
+  methods: {
+    getNode: function(codename, id) {
+      const query = this.$static[codename];
+
+      if (typeof(query) === 'undefined') {
+        return null;
+      }
+
+      const edges = query.edges.filter(
+        edge => edge.node.id === id
+      );
+
+      if (edges.length === 1) {
+        return edges[0].node;
+      }
+
+      return null;
+    }
   }
 };
 </script>
@@ -265,13 +284,294 @@ Every asset object has the following fields provided by the Kentico Cloud delive
 
 ## Rendering Rich Text fields
 
-TODO
+A Rich Text field is a string containing HTML markup, and that HTML markup can contain standard HTML elements as well as:
 
-The recommended way to render child components, links and assets embedded in Rich Text fields when using this plugin is to write your own Vue components that you define in your Gridsome app. It is recommended because it is idiomatic of a Vue component to render components in this way, and preferred to embedding HTML markup into [delivery client](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#resolving-content-items-and-components-in-rich-text-elements) requests or `[ContentItem](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#url-slugs-links)` classes.
+* Anchor links to other content that require resolving the link URL to the actual URL within your application
+* Assets such as images that may require some flexibility in rendering (such as the use of lazy loading and/or `srcset` and `sizes`)
+* Custom elements that represent [content components](https://docs.kenticocloud.com/tutorials/write-and-collaborate/structure-your-content/structuring-editorial-articles-with-components)
+
+As briefly touched on in the [getting started](#configure-gridsome-to-resolve-rich-text-fields-using-vue-single-file-components) guide, the recommended way to render Rich Text fields when using this plugin is to use a Vue single file component to represent a Rich Text field, which will:
+
+* Compile the HTML markup as a dynamic template using [`v-runtime-template`](https://github.com/alexjoverm/v-runtime-template); and
+* Allow you to write other Vue single file components to represent content components, content links and assets
+
+The following sub-sections detail how to implement the above, and assume that you have already created the `RichText` component outlined in the getting started section.
+
+### Rendering content links in Rich Text fields
+
+First add a query to your `RichText` component inside a `<static-query>` block that will fetch all `ItemLink` objects. The alias for `allItemLink` must be `item_link` as shown below:
+
+```graphql
+query RichText {
+  item_link: allItemLink {
+    edges {
+      node {
+        id,
+        path
+      }
+    }
+  }
+}
+```
+
+> If you already have a `RichText` query you can add the `item_link` alias and fields alongside other aliases.
+
+Next you must create an `ItemLink` Vue single file component that has a `node` prop, and will render the link appropriately. The "shape" of the `node` prop object will match the node defined on the `item_link` query. The component must also have a `slot` via which the link text will be passed. For example:
+
+```html
+<template>
+  <g-link :to="node.path">
+    <slot />
+  </g-link>
+</template>
+
+<script>
+export default {
+  props: {
+    node: {
+      type: Object,
+      required: true
+    }
+  }
+};
+</script>
+```
+
+Finally, you must add the `ItemLink` component to your `RichText` component:
+
+```html
+<script>
+import VRuntimeTemplate from 'v-runtime-template';
+import ItemLink from '~/components/ItemLink.vue';
+
+export default {
+  components: {
+    VRuntimeTemplate,
+    ItemLink
+  },
+  props: {
+    html: {
+      ...
+    }
+  },
+  methods: {
+    getNode: function(codename, id) {
+      ...
+    }
+  }
+};
+</script>
+```
+
+Now if the Rich Text field HTML passed in the `html` prop of the `RichText` component contains any `item-link` components, those components have a `node` attribute that will call the `getNode` method with a `codename` of `item_link`, and an `id` that matches the content they are linking to. If an object with a matching `id` is found in the collection, it will be passed to the `item-link` component's `node` prop, otherwise `null` will be passed.
+
+🙋 See the section on [configuration](#configuration) for options on how to customise component names.
+
+### Rendering assets in Rich Text fields
+
+First add a query to your `RichText` component inside a `<static-query>` block that will fetch all `Asset` objects. The alias for `allAsset` must be `asset` as shown below:
+
+```graphql
+query RichText {
+  asset: allAsset {
+    edges {
+      node {
+        id,
+        url(width: 1200, format: "webp"),
+        placeholderUrl: url(width: 50, format: "webp")
+        description
+      }
+    }
+  }
+}
+```
+
+> If you already have a `RichText` query you can add the `asset` alias and fields alongside other aliases.
+
+Next you must create an `Asset` Vue single file component that has a `node` prop, and will render the asset appropriately. The "shape" of the `node` prop object will match the node defined on the `asset` query. For example:
+
+```html
+<template>
+  <v-lazy-image
+    :src="node.url"
+    :src-placeholder="node.placeholderUrl"
+    :alt="node.description"
+  />
+</template>
+
+<script>
+import VLazyImage from 'v-lazy-image';
+
+export default {
+  components: {
+    VLazyImage
+  },
+  props: {
+    node: {
+      type: Object,
+      required: true
+    }
+  }
+};
+</script>
+
+<style scoped>
+img {
+   width: 100%;
+}
+
+.v-lazy-image {
+  filter: blur(5px);
+  transition: filter 1.6s;
+  will-change: filter;
+}
+
+.v-lazy-image-loaded {
+  filter: blur(0);
+}
+</style>
+```
+
+> Unfortunately Gridsome's [g-image](https://gridsome.org/docs/images) component doesn't appear to work with `v-runtime-template` so the example above is using [v-lazy-image](https://github.com/alexjoverm/v-lazy-image), but you can try whatever you wish in your own component!
+
+Finally, you must add the `Asset` component to your `RichText` component:
+
+```html
+<script>
+import VRuntimeTemplate from 'v-runtime-template';
+import Asset from '~/components/Asset.vue';
+
+export default {
+  components: {
+    VRuntimeTemplate,
+    Asset
+  },
+  props: {
+    html: {
+      ...
+    }
+  },
+  methods: {
+    getNode: function(codename, id) {
+      ...
+    }
+  }
+};
+</script>
+```
+
+Now if the Rich Text field HTML passed in the `html` prop of the `RichText` component contains any `asset` components, those components have a `node` attribute that will call the `getNode` method with a `codename` of `asset`, and an `id` that matches the asset they represent. If an object with a matching `id` is found in the collection, it will be passed to the `asset` component's `node` prop, otherwise `null` will be passed.
+
+🙋 See the section on [configuration](#configuration) for options on how to customise component names.
+
+### Rendering content components in Rich Text fields
+
+First add a query to your `RichText` component inside a `<static-query>` block that will fetch all `<Content>` objects. The alias for `all<Content>` must match the codename of the Kentico Cloud content type that the `<Content>` belongs to:
+
+> In the following examples, we will create a component to render code snippets, so the `<Content>` object type is `CodeSnippet` and content type codename is `code_snippet`:
+
+```graphql
+query RichText {
+  code_snippet: allCodeSnippet {
+    edges {
+      node {
+        id,
+        code,
+        language {
+          name
+        }
+      }
+    }
+  }
+}
+```
+
+> If you already have a `RichText` query you can add the `code_snippet` alias and fields alongside other aliases.
+
+Next you must create a `CodeSnippet` Vue single file component that has a `node` prop, and will render the asset appropriately. The "shape" of the `node` prop object will match the node defined on the `code_snippet` query. For example:
+
+```html
+<template>
+  <pre class="code-snippet">{{ node.code }}</pre>
+</template>
+
+<script>
+export default {
+  props: {
+    node: {
+      type: Object,
+      required: true
+    }
+  }
+};
+</script>
+```
+
+Finally, you must add the `CodeSnippet` component to your `RichText` component:
+
+```html
+<script>
+import VRuntimeTemplate from 'v-runtime-template';
+import CodeSnippet from '~/components/CodeSnippet.vue';
+
+export default {
+  components: {
+    VRuntimeTemplate,
+    CodeSnippet
+  },
+  props: {
+    html: {
+      ...
+    }
+  },
+  methods: {
+    getNode: function(codename, id) {
+      ...
+    }
+  }
+};
+</script>
+```
+
+Now if the Rich Text field HTML passed in the `html` prop of the `RichText` component contains any `code-snippet` components, those components have a `node` attribute that will call the `getNode` method with a `codename` of `code_snippet`, and an `id` that matches the code snippet they represent. If an object with a matching `id` is found in the collection, it will be passed to the `code-snippet` component's `node` prop, otherwise `null` will be passed.
+
+🙋 See the section on [configuration](#configuration) for options on how to customise component names.
 
 ### Opting-out of this approach
 
-TODO
+Although the approach to Rich Text outlined above is recommended it may not be for everybody or every application so it is possible to "opt-out" by setting certain option values to `null` in the plugin configuration. The following options are all keys of `contentItemCong.richText`:
+
+| Option key | Behaviour when set to `null` |
+| --- | --- |
+| `wrapperCssClass` | Prevents any transformation of Rich Text HTML elements to components |
+| `itemLinkSelector` | Content links are not transformed to `item-link` components |
+| `assetSelector` | Assets are not transformed to `asset` components |
+| `componentSelector` | Content components are not transformed to `<content>` components |
+
+For example:
+
+```javascript
+  plugins: [
+    {
+      use: '@meeg/gridsome-source-kentico-cloud',
+      options: {
+        ...
+        contentItemConfig: {
+          ...
+          richText: {
+            wrapperCssClass: null
+          }
+          ...
+        }
+        ...
+      }
+    }
+  }
+```
+
+If you opt out of this approach you can use features of the Kentico Cloud delivery client to resolve [content links](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#url-slugs-links) and [content components](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#resolving-content-items-and-components-in-rich-text-elements), but not assets. These features of the delivery client are exposed by this plugin when [creating content models](#creating-content-models).
+
+🙋 See the section on [configuration](#configuration) for options on how to customise Rich Text transformation.
 
 ## Routing
 

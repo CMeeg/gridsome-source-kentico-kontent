@@ -14,19 +14,19 @@ class KenticoCloudSourcePlugin {
       },
       contentItemConfig: {
         contentItemTypeNamePrefix: '',
+        assetTypeName: 'Asset',
+        itemLinkTypeName: 'ItemLink',
         contentItems: {},
         routes: {},
         richText: {
           wrapperCssClass: 'rich-text',
           componentNamePrefix: '',
-          itemLinkSelector: 'a[data-item-id]',
-          itemLinkComponentName: 'item-link',
           componentSelector: 'p[data-type="item"]',
-          assetSelector: 'figure[data-asset-id]',
-          assetComponentName: 'asset'
-        },
-        assetTypeName: 'Asset',
-        itemLinkTypeName: 'ItemLink'
+          itemLinkComponentName: 'item-link',
+          itemLinkSelector: 'a[data-item-id]',
+          assetComponentName: 'asset',
+          assetSelector: 'figure[data-asset-id]'
+        }
       },
       taxonomyConfig: {
         taxonomyTypeNamePrefix: 'Taxonomy',
