@@ -1,17 +1,21 @@
 # @meeg/gridsome-source-kentico-cloud
 
-A [Kentico Cloud](https://kenticocloud.com/) data source plugin for  [Gridsome](https://gridsome.org/) that aims to support all of the main features of Kentico Cloud:
+A [Kentico Cloud](https://kenticocloud.com/) data source plugin for [Gridsome](https://gridsome.org/) that aims to support all of the main features of Kentico Cloud:
 
 ✔ Content (including all content element types)\
 ✔ Taxonomy\
 ✔ Assets
 
-The following features and extension points are also provided to ease working with your Kentico Cloud content in Gridsome:
+The plugin also provides additional features and extension points to ease working with your Kentico Cloud content in Gridsome. Please keep reading to learn about:
 
-✔ Customise how content from Kentico Cloud is represented in the Gridsome GraphQL schema e.g. control how object types are named, how fields are resolved, omit unwanted fields, add custom fields\
-✔ Customise routing of content and taxonomy pages\
-✔ Write your own Vue components to render content components, content links, and assets embedded in Rich Text fields\
-✔ Transform asset URLs directly from your GraphQL queries e.g. specify width, height, format via arguments
+* How to [get started](#getting-started) with this plugin
+* The object types and object models that are added to the Gridsome [GraphQL schema](#kentico-cloud-graphql-schema) by this plugin
+* How to [render Rich Text fields](#rendering-rich-text-fields) using Vue single file components that you define in your app
+* How to [customise routing](#routing) of content and taxonomy objects
+* How to [work with Taxonomy](#working-with-taxonomy-in-gridsome) in Gridsome
+* How to [work with Assets](#working-with-assets-in-gridsome) in Gridsome, and how to transform Asset URLs directly in your GraphQL queries
+* How to [create content models](#creating-content-models) to allow you to customise how content from Kentico Cloud is represented as data in Gridsome
+* The full list of plugin [configuration options](#configuration)
 
 ---
 
@@ -100,15 +104,7 @@ From this point on you are ready to work with your Kentico Cloud content as data
 >
 > Remember to use the [GraphQL explorer](https://gridsome.org/docs/querying-data#explore--test-queries) to explore your schema, and test queries when in [development mode](https://gridsome.org/docs/how-it-works#gridsome-develop).
 
-🙋 Please keep reading for a more in-depth discussion of the features of this plugin, including descriptions of:
-
-* The object types and object models added to the [GraphQL schema](#kentico-cloud-graphql-schema) by this plugin
-* How to [render Rich Text fields](#rendering-rich-text-fields) using Vue single file components that you define in your app
-* How to [customise routing](#routing) of content and taxonomy objects
-* How to work with [Taxonomy](#working-with-taxonomy-in-gridsome) in Gridsome
-* How to work with [Assets](#working-with-assets-in-gridsome) in Gridsome and transform Asset URLs directly in your GraphQL queries
-* How to [create content models](#creating-content-models) to allow you to customise how content from Kentico Cloud is represented in the GraphQL schema
-* The full list of plugin [configuration options](#configuration)
+🙋 Now we've covered the basics, please keep reading for a more in-depth discussion of the various features of this plugin.
 
 ---
 
