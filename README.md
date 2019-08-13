@@ -650,11 +650,15 @@ The `slug` field is added to each taxonomy term object by this plugin and is gen
 
 The Gridsome documentation describes how to [create a taxonomy page](https://gridsome.org/docs/taxonomies) template to display a `Tag` object and the `Post` objects that reference that `Tag`.
 
-To achieve this with the Kentico Cloud plugin you will need to ensure that you set up [routing](#taxonomy-routing) for the taxonomy group that you want to list (i.e. your equivalent of `Tag`).
+To achieve this with the Kentico Cloud plugin you will need to ensure that you first set up [routing](#taxonomy-routing) for the taxonomy group that you want to list (i.e. your equivalent of `Tag`), and then you can follow along with the documented approach.
 
-> The plugin will take care of adding the required references between [Taxonomy objects](#taxonomy-objects) and [Content objects](#content-objects) (i.e. your equivalent of `Post`) via any [Taxonomy content elements](#content-element-fields) defined on the the Content object's content type in Kentico Cloud.
+> The plugin will take care of adding the required references between [Taxonomy objects](#taxonomy-objects) (i.e. your equivalent of `Tag`) and [Content objects](#content-objects) (i.e. your equivalent of `Post`) via any [Taxonomy content elements](#content-element-fields) defined on the the Content object's content type in Kentico Cloud.
 
-To do the inverse of what is documented and create a template to display a `Post` object and the `Tag` objects that the `Post` references, you can use a query like the below:
+### Other Taxonomy scenarios
+
+Below are a couple of examples of other things you can do with Taxonomy in Gridsome.
+
+To do the inverse of what is documented and create a template to display a `Post` object and the `Tag` objects that the `Post` references (for example to list tags for a post), you can use a query like the below:
 
 ```graphql
 query Post ($id: String!) {
@@ -668,7 +672,7 @@ query Post ($id: String!) {
 }
 ```
 
-And if you wanted to list all `Tag` objects including a count of how many `Post` objects reference each tag, you can use a query like the below:
+If you wanted to list all `Tag` objects including a count of how many `Post` objects reference each tag (for example in a "tag cloud" component), you can use a query like the below:
 
 ```graphql
 query Tags {
