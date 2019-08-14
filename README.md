@@ -736,9 +736,221 @@ query Assets {
 
 ## Creating content models
 
-TODO
+The default behaviour of this plugin when translating content from Kentico Cloud to objects in the [Gridsome GraphQL schema](#content-objects) should hopefully be sufficient in the majority of cases - a goal of the plugin is to allow consumers to get up and running with as little configuration as possible. However, the plugin does provide an extension point should you find yourself in a position where you want to modify the default behaviour.
 
-The majority of the work required to translate content elements to GraphQL fields is performed via custom `ContentItem` [models](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#creating-models) that are automatically passed to the delivery client as [type resolvers](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#initializing-deliveryclient).
+> Extending the translation of `Taxonomy` and `Asset` objects is not currently supported as those types are essentially comprised only of "system" fields and cannot be extended in Kentico Cloud; compared to content types that also have "system" fields, but are designed to be extended in Kentico Cloud by adding content elements.
+
+The majority of the work required to translate content from Kentico Cloud to the Gridsome GraphQL schema is performed via a custom `ContentItem` [model](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#creating-models) that is automatically passed to the delivery client as a [type resolver](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#initializing-deliveryclient).
+
+The default behaviour is to use the same content model for all Kentico Cloud content types. This content model is represented by the `GridsomeContentItem` class, which is a sub-class of `ContentItem`.
+
+To modify the default behaviour you can create a new class that extends `GridsomeContentItem` and register it as the type resolver for one or more Kentico Cloud content types.
+
+### Extending `GridsomeContentItem`
+
+For demonstration purposes we will use an example where we want to manipulate content data as it is inserted into Gridsome's data store so that we don't have to keep applying some logic on the data each and every time we use it within our application.
+
+This is our scenario:
+
+* There is a Kentico Cloud content type called `Post` that has a codename of `post`
+* The content type has a content element called `Date` with a codename of `date` that can be used to manually specify the date that the post was posted, with the intention being to fall back to the system last modified date if no `Date` value is specified
+* When this plugin runs it creates an object type in the Gridsome GraphQL schema named `Post`, but the field that represents the `Date` content element is called `date1` because it [collides](#content-element-fields) with the system `date` field
+
+The goal is to:
+
+* Set the system `date` field to the value of the `Date` content element, but only if a value has been set; otherwise leave the `date` field value as it is
+* Remove the `date1` field as it is redundant once the `date` field value has been resolved as above
+
+To do this we must first create a custom content model somewhere in our application that extends `GridsomeContentItem` and implements the desired behaviour:
+
+```javascript
+const { GridsomeContentItem } = require('@meeg/gridsome-source-kentico-cloud');
+
+class PostContentItem extends GridsomeContentItem {
+  // Override the `addFields` method - this is called after all "system" fields are set
+  addFields(node) {
+    /*
+    Call the `addFields` method of the base class - we want the default behaviour to run
+    first, and then we will manipulate the data to enforce our custom behaviour
+    */
+    super.addFields(node);
+
+    this.ensureDateField(node);
+
+    return node;
+  }
+
+  ensureDateField(node) {
+    /*
+    `node.item` contains the data that will eventually end up as an object in the
+    Gridsome GraphQL schema
+    */
+    const postDate = new Date(node.item.date1);
+    const lastModified = new Date(node.item.date);
+
+    // If a date has been provided, use it instead of the system date
+
+    if (!this.isNullDate(postDate)) {
+      node.item.date = postDate;
+    }
+
+    // Add the system date as a custom field i.e. one that does not correspond to a content element
+
+    node.item.lastModified = lastModified;
+
+    // Remove the redundant `date1` field
+
+    node.item.date1 = undefined;
+  }
+
+  isNullDate(date) {
+    if (typeof(date) === 'undefined') {
+      return true;
+    }
+
+    if (date === null) {
+      return true;
+    }
+
+    // If a date value is null in Kentico Cloud it can be parsed as a zero UTC date
+
+    return date.getTime() === 0;
+  }
+}
+
+module.exports = PostContentItem;
+```
+
+Now we have implemented our desired behaviour we need to [register the class model as a type resolver](#registering-type-resolvers).
+
+### Registering type resolvers
+
+Type resolvers can be registered via the options exposed by this plugin. To do so you must add an item to the `contentItemConfig.contentItems` object with a key matching the content type codename you wish to specify the type resolver for, and a value that references the content model class that you wish as the type resolver for that content type. For example:
+
+```javascript
+const PostContentItem = require('./the/path/to/PostContentItem');
+
+module.exports = {
+  ...
+  plugins: [
+    {
+      use: '@meeg/gridsome-source-kentico-cloud',
+      options: {
+        ...
+        contentItemConfig: {
+          ...
+          contentItems: {
+            post: PostContentItem
+          }
+          ...
+        }
+        ...
+      }
+    }
+  }
+  ...
+}
+```
+
+### Other scenarios
+
+There could be any number of scenarios in which you may wish to extend `GridsomeContentItem`, but here are a couple more examples.
+
+#### Set a field value based on linked content items
+
+We saw earlier that you can [extend how field data is set](#extending-gridsomecontentitem) within a content model by overriding the `addFields` method. The `addFields` method receives a `node` object that represents the data from a single content item from Kentico Cloud transformed into a data structure that will be used to populate the Gridsome GraphQL data store.
+
+In the previous example we used the `item` property of the `node` to get and set field values, but the `node` object has other properties that can be used when manipulating field data.
+
+For example, in this scenario:
+
+* We have a `Post series` content type in Kentico Cloud with a codename of `post_series`
+* The `Post series` content type has a "Linked items" content element called `Posts in series` with codename `posts_in_series`
+* `Posts in series` has a constraint requiring at least one linked item be set
+
+The goal is to:
+
+* Add a `lastUpdated` field to the corresponding `PostSeries` object type in the Gridsome GraphQL schema (there is no corresponding content element on the Kentico Cloud content type)
+* Set the value of the `lastUpdated` field by getting the linked posts in its `postsInSeries` field, and using the most recent `date` value of the linked `Post` objects
+
+```javascript
+const { GridsomeContentItem } = require('@meeg/gridsome-source-kentico-cloud');
+
+class PostSeriesContentItem extends GridsomeContentItem {
+  addFields(node) {
+    super.addFields(node);
+
+    this.setLastUpdatedField(node);
+
+    return node;
+  }
+
+  setLastUpdatedField(node) {
+    // Find the `postsInSeries` field and then run it through a map function to return the most recent post date
+    const postLastUpdated = node.linkedItemFields
+      .filter(field => field.fieldName === 'postsInSeries')
+      .map(field => this.getPostLastUpdated(field.linkedItems));
+
+    // Add the most recent post date as a new field called `lastUpdated`
+    const value = postLastUpdated[0];
+
+    // Calling the `addField` function will make sure there are no field name collisions
+    this.addField(node, 'lastUpdated', value);
+  }
+
+  getPostLastUpdated(posts) {
+    const postDates = posts
+      .map(post => {
+        const node = post.createNode();
+        const date = node.item.date;
+
+        return date;
+      })
+      .reduce((prevDate, currentDate) => {
+        return prevDate > currentDate ? prevDate : currentDate
+      });
+
+    return postDates;
+  }
+}
+
+module.exports = PostSeriesContentItem;
+```
+
+> When you are inside an instance function such as `addFields` you also have access to all of the properties of a regular `ContentItem` such as `this.system` and `this.elements` should you need them.
+
+#### Custom Rich Text and Link resolvers
+
+`GridsomeContentItem` uses custom [richTextResolver](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#globally) and [linkResolver](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#resolving-url-slugs-globally) functions to aid in the approach for [rendering Rich Text fields](#rendering-rich-text-fields), but if you decide to [opt out](#opting-out-of-this-approach) of that approach you may want to provide your own resolver functions.
+
+You can do so like this:
+
+```javascript
+
+const { GridsomeContentItem } = require('@meeg/gridsome-source-kentico-cloud');
+
+class PostContentItem extends GridsomeContentItem {
+  // We need to override the constructor of `GridsomeContentItem`
+  constructor(typeName, route, richTextHtmlTransformer) {
+    /*
+    Set our resolvers - N.B this `data` object mimics the object that you can pass to the `ContentItem` constructor
+    */
+    const data = {
+        richTextResolver: (item, context) => {
+          return `<h3 class="resolved-item">${item.name.text}</h3>`;
+        },
+        linkResolver: (link, context) => {
+          return `/posts/${url_slug}`;
+        }
+    };
+
+    // Execute the super constructor, passing in your resolver functions
+    super(typeName, route, richTextHtmlTransformer, data);
+  }
+}
+
+module.exports = PostContentItem;
+```
 
 ## Configuration
 
