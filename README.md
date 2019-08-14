@@ -21,6 +21,8 @@ The plugin also provides additional features and extension points to ease workin
 
 ## Getting started
 
+> This getting started guide assumes that you have an existing Gridsome project, and that you want to add Kentico Cloud as a data source using this plugin. If you haven't yet created a Gridsome project, please follow the [Gridsome getting started guide](https://gridsome.org/docs) first and then come back here.
+
 ### Install
 
 Use your preferred package manager to add a dependency on `@meeg/gridsome-source-kentico-cloud` to your Gridsome app, for example:
@@ -129,7 +131,7 @@ From this point on you are ready to work with your Kentico Cloud content as data
 
 ## Kentico Cloud GraphQL schema
 
-The following types of data are sourced from Kentico Cloud and made available for querying via the Gridsome GraphQL schema:
+The following types of data are sourced from Kentico Cloud and made available for querying via the Gridsome GraphQL data store:
 
 * [Content objects](#content-objects)
 * [Taxonomy objects](#taxonomy-objects)
@@ -212,9 +214,9 @@ The `isComponent` system field can be used to filter content component objects i
 
 When editing content inside Rich Text elements in Kentico Cloud you can [add links to other content items](https://docs.kenticocloud.com/tutorials/write-and-collaborate/write-content/composing-content-in-the-rich-text-editor#a-adding-links) within your Kentico Cloud project. To resolve these links within your Gridsome app, the `path` of the content item that has been linked to must be used as the URL of the link.
 
-Gridsome generates the `path` value for an object (based on a [defined](#content-routing) `route`) when it is inserted into the GraphQL schema via the [Data Store API](https://gridsome.org/docs/data-store-api#collectionaddnodeoptions).
+Gridsome generates the `path` value for an object (based on a [defined](#content-routing) `route`) when it is inserted into the GraphQL data store via the [Data Store API](https://gridsome.org/docs/data-store-api#collectionaddnodeoptions).
 
-To get the `path` of an object in the GraphQL schema you must either:
+To get the `path` of an object in the GraphQL data store you must either:
 
 1. Already have a reference to the relevant content object; or
 2. Know the `id` and `typeName` of the content item that has been linked to, and form a GraphQL query to fetch an object with the `id` from the object type that corresponds to the `typeName`
@@ -551,22 +553,22 @@ Although the approach to Rich Text outlined above is recommended it may not be f
 For example:
 
 ```javascript
-  plugins: [
-    {
-      use: '@meeg/gridsome-source-kentico-cloud',
-      options: {
+plugins: [
+  {
+    use: '@meeg/gridsome-source-kentico-cloud',
+    options: {
+      ...
+      contentItemConfig: {
         ...
-        contentItemConfig: {
-          ...
-          richText: {
-            wrapperCssClass: null
-          }
-          ...
+        richText: {
+          wrapperCssClass: null
         }
         ...
       }
+      ...
     }
   }
+}
 ```
 
 If you opt out of this approach you can use features of the Kentico Cloud delivery client to resolve [content links](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#url-slugs-links) and [content components](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#resolving-content-items-and-components-in-rich-text-elements), but not assets. These features of the delivery client are exposed by this plugin when [creating content models](#creating-content-models).
@@ -591,23 +593,23 @@ Where:
 It is possible to override the default route for each of your Kentico Cloud content types using the options exposed by this plugin. To do so you must add an item to the `contentItemConfig.routes` object with a key matching the content type codename you wish to specify the route for, and a value matching the desired route that you wish to use for that content type. For example:
 
 ```javascript
-  plugins: [
-    {
-      use: '@meeg/gridsome-source-kentico-cloud',
-      options: {
+plugins: [
+  {
+    use: '@meeg/gridsome-source-kentico-cloud',
+    options: {
+      ...
+      contentItemConfig: {
         ...
-        contentItemConfig: {
-          ...
-          routes: {
-            article: '/articles/:slug',
-            author: '/about'
-          }
-          ...
+        routes: {
+          article: '/articles/:slug',
+          author: '/about'
         }
         ...
       }
+      ...
     }
   }
+}
 ```
 
 > The route that you specify can use any [parameters](https://gridsome.org/docs/routing#route-params) that Gridsome can resolve.
@@ -621,22 +623,22 @@ There is no routing of Taxonomy objects by default.
 To define a route for a Kentico Cloud taxonomy group you must use the options exposed by this plugin. To do so you must add an item to the `taxonomyConfig.routes` object with a key matching the taxonomy group codename you wish to specify the route for, and a value matching the desired route that you wish to use for that taxonomy group. For example:
 
 ```javascript
-  plugins: [
-    {
-      use: '@meeg/gridsome-source-kentico-cloud',
-      options: {
+plugins: [
+  {
+    use: '@meeg/gridsome-source-kentico-cloud',
+    options: {
+      ...
+      taxonomyConfig: {
         ...
-        taxonomyConfig: {
-          ...
-          routes: {
-            tags: '/tags/:slug'
-          }
-          ...
+        routes: {
+          tags: '/tags/:slug'
         }
         ...
       }
+      ...
     }
   }
+}
 ```
 
 > The route that you specify can use any [parameters](https://gridsome.org/docs/routing#route-params) that Gridsome can resolve.
@@ -736,11 +738,11 @@ query Assets {
 
 ## Creating content models
 
-The default behaviour of this plugin when translating content from Kentico Cloud to objects in the [Gridsome GraphQL schema](#content-objects) should hopefully be sufficient in the majority of cases - a goal of the plugin is to allow consumers to get up and running with as little configuration as possible. However, the plugin does provide an extension point should you find yourself in a position where you want to modify the default behaviour.
+The default behaviour of this plugin when translating content from Kentico Cloud to objects in the [Gridsome GraphQL data store](#content-objects) should hopefully be sufficient in the majority of cases - a goal of the plugin is to allow consumers to get up and running with as little configuration as possible. However, the plugin does provide an extension point should you find yourself in a position where you want to modify the default behaviour.
 
 > Extending the translation of `Taxonomy` and `Asset` objects is not currently supported as those types are essentially comprised only of "system" fields and cannot be extended in Kentico Cloud; compared to content types that also have "system" fields, but are designed to be extended in Kentico Cloud by adding content elements.
 
-The majority of the work required to translate content from Kentico Cloud to the Gridsome GraphQL schema is performed via a custom `ContentItem` [model](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#creating-models) that is automatically passed to the delivery client as a [type resolver](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#initializing-deliveryclient).
+The majority of the work required to translate content from Kentico Cloud to the Gridsome GraphQL data store is performed via a custom `ContentItem` [model](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#creating-models) that is automatically passed to the delivery client as a [type resolver](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#initializing-deliveryclient).
 
 The default behaviour is to use the same content model for all Kentico Cloud content types. This content model is represented by the `GridsomeContentItem` class, which is a sub-class of `ContentItem`.
 
@@ -783,7 +785,7 @@ class PostContentItem extends GridsomeContentItem {
   ensureDateField(node) {
     /*
     `node.item` contains the data that will eventually end up as an object in the
-    Gridsome GraphQL schema
+    Gridsome GraphQL data store
     */
     const postDate = new Date(node.item.date1);
     const lastModified = new Date(node.item.date);
