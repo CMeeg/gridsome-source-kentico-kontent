@@ -954,6 +954,19 @@ class PostContentItem extends GridsomeContentItem {
 module.exports = PostContentItem;
 ```
 
+## Logging and debugging
+
+The plugin uses the [debug](https://github.com/visionmedia/debug) library for logging. It can be used for debugging or just gathering logs about what the plugin is doing.
+
+The plugin defines the following namespaces:
+
+| Namespace | Description |
+| --- | --- |
+| `gridsome-source-kentico-cloud` | Use this to log very basic info about when the plugin starts and finishes its work |
+| `gridsome-source-kentico-cloud:source` | Use this to log detailed information about the work that the plugin is doing |
+
+Please read the debug docs for usage instructions.
+
 ## Configuration
 
 TODO
