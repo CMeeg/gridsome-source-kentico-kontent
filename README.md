@@ -969,53 +969,64 @@ Please read the debug docs for usage instructions.
 
 ## Configuration
 
-TODO
+The plugin exposes various configuration options that are split into the following top level objects:
 
+```javascript
+plugins: [
+  {
+    use: '@meeg/gridsome-source-kentico-cloud',
+    options: {
+      deliveryClientConfig: {
+        // Options for the Kentico Cloud delivery client
+      },
+      contentItemConfig: {
+        // Options used when loading Kentico Cloud content data
+      },
+      taxonomyConfig: {
+        // Options used when loading Kentico Cloud taxonomy data
+      }
+  }
+]
+```
 
+> The only required option that must be set for this plugin to function is `deliveryClientConfig.projectId` as seen in the [getting started](#add-and-configure-the-plugin) section. All other options are set with default values that can be overridden by the consuming application.
 
+### `deliveryClientConfig` options
 
----
+These options are identical to the Kentico Cloud delivery client configuration options, with one exception:
 
-TODO: Remove all of the below notes when done!
+| Key | Type | Default value | Notes |
+| --- | --- | --- | --- |
+| `contentItemsDepth` | `Number` | `3` | Sets the `depth` parameter on content queries, which can be used to [handle missing referenced linked items](https://github.com/Kentico/kentico-cloud-js/blob/delivery%405.7.2/packages/delivery/DOCS.md#handling-missing-referenced-linked-items) |
 
-- Getting started
-- Options
-    - Delivery client
-        - [Preview](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#preview-mode)
-        - [Secure API](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#secured-delivery-api-mode)
-        - [Language](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#getting-localized-items)
-        - [Type resolvers](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#initializing-deliveryclient)
-    - Recommend use of env files
-- GridsomeContentItem
-    - File system convention
-    - [Models](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#creating-models)
-    - [Type resolvers](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#initializing-deliveryclient)
-    - [Property resolver](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#property-binding-in-models)
-    - Nodes
-        - Fields
-            - Common fields
-        - Taxonomy
-        - [Linked items](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#strongly-typed-nested-items)
-            - If possible, avoid content elements with same codename but different types e.g. text and rich text
-        - Assets
-    - Routes
-        - Don't use [link resolver](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#url-slugs-links)
-        - Links in Rich Text fields
-    - Extensibility
-        - Field resolvers
-            - Field name
-            - Type
-            - Default
-    - Using [Kentico Cloud Model Generator](https://www.npmjs.com/package/kentico-cloud-model-generator-utility)
-- Rich text
-    - Rich Text as dynamic Vue template
-        - v-runtime-template
-            - Configuration
-            - eslint error about unused components
-        - Content item links
-            - Item link
-        - [Content items and components](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#resolving-content-items-and-components-in-rich-text-fields)
-            - Vue components
-            - Removal of wrapper element
-    - Prefer "Image" content type over inline assets to give more control
-        - Link to KC docs mentioning this
+Please see the [Kentico Cloud documentation](https://github.com/Kentico/kentico-cloud-js/blob/delivery%405.7.2/packages/delivery/DOCS.md#client-configuration) for a description of all other available options, which include options for setting preview mode, secure mode, and language.
+
+### `contentItemConfig` options
+
+| Key | Type | Default value | Notes |
+| --- | --- | --- | --- |
+| `contentItemTypeNamePrefix` | `String` | `''` | If set, this value will be added as a prefix to generated [content object type](#content-objects) names |
+| `assetTypeName` | `String` | `'Asset'` | If set, this value will be used as the [asset object type](#asset-objects) name |
+| `itemLinkTypeName` | `String` | `'ItemLink'` | If set, this value will be used as the [item link object type](#item-links) name |
+| `contentItems` | `Object` | `{}` | Please see the [creating content models](#creating-content-models) section |
+| `routes` | `Object` | `{}` | Please see the [content routing](#content-routing) section |
+| `richText` | `Object` |  | Please see the [richText options](#richtext-options) section |
+
+#### `richText` options
+
+| Key | Type | Default value | Notes |
+| --- | --- | --- | --- |
+| `wrapperCssClass` | `String` | `'rich-text'` | When used as a Vue [template](#rendering-rich-text-fields), Rich Text HTML must have a single root node and so the plugin wraps the HTML in a div with a class attribute set to this value; can be set to `null` to [opt out](#opting-out-of-this-approach) of the default approach to rendering Rich Text fields |
+| `componentNamePrefix` | `String` | `''` | If set, this value will be added as a prefix to the component name used to [render content components](#rendering-content-components-in-rich-text-fields) in Rich Text fields |
+| `componentSelector` | `String` | `'p[data-type="item"]'` | This CSS selector is used to find elements that represent content components in Rich Text HTML; can be set to `null` to [opt out](#opting-out-of-this-approach) of the default approach to rendering content components in Rich Text fields |
+| `itemLinkComponentName` | `String` | `'item-link'` | This value will be used as the component name used to [render content links](#rendering-content-links-in-rich-text-fields) in Rich Text fields |
+| `itemLinkSelector` | `String` | `'a[data-item-id]'` | This CSS selector is used to find elements that represent content links in Rich Text HTML; can be set to `null` to [opt out](#opting-out-of-this-approach) of the default approach to rendering content links in Rich Text fields |
+| `assetComponentName` | `String` | `'asset'` | This value will be used as the component name used to [render assets](#rendering-assets-in-rich-text-fields) in Rich Text fields |
+| `assetSelector` | `String` | `'figure[data-asset-id]'` | This CSS selector is used to find elements that represent assets in Rich Text HTML; can be set to `null` to [opt out](#opting-out-of-this-approach) of the default approach to rendering assets in Rich Text fields |
+
+### `taxonomyConfig` options
+
+| Key | Type | Default value | Notes |
+| --- | --- | --- | --- |
+| `taxonomyTypeNamePrefix` | `String` | `'Taxonomy'` | If set, this value will be added as a prefix to generated [taxonomy object type](#taxonomy-objects) names |
+| `routes` | `Object` | `{}` | Please see the [taxonomy routing](#taxonomy-routing) section |
