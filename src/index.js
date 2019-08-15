@@ -31,15 +31,12 @@ class KenticoCloudSourcePlugin {
       taxonomyConfig: {
         taxonomyTypeNamePrefix: 'Taxonomy',
         routes: {}
-      },
-      loggerConfig: {
-        enable: 'gridsome-source-kentico-cloud'
       }
     }
   };
 
   constructor(api, options) {
-    const logger = new Logger('gridsome-source-kentico-cloud', options.loggerConfig);
+    const logger = new Logger('gridsome-source-kentico-cloud');
 
     api.loadSource(async store => {
       const deliveryClient = new DeliveryClient(options.deliveryClientConfig);
