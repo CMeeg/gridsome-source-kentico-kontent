@@ -42,6 +42,7 @@ plugins: [
       deliveryClientConfig: {
         projectId: process.env.KENTICO_CLOUD_PROJECT_ID
       }
+    }
   }
 ]
 ```
@@ -1033,6 +1034,7 @@ plugins: [
       taxonomyConfig: {
         // Options used when loading Kentico Cloud taxonomy data
       }
+    }
   }
 ]
 ```
