@@ -36,13 +36,13 @@ Add `@meeg/gridsome-source-kentico-cloud` to the plugins array in your `gridsome
 
 ```javascript
 plugins: [
-    {
-      use: '@meeg/gridsome-source-kentico-cloud',
-      options: {
-        deliveryClientConfig: {
-          projectId: process.env.KENTICO_CLOUD_PROJECT_ID
-        }
-    }
+  {
+    use: '@meeg/gridsome-source-kentico-cloud',
+    options: {
+      deliveryClientConfig: {
+        projectId: process.env.KENTICO_CLOUD_PROJECT_ID
+      }
+  }
 ]
 ```
 
@@ -698,7 +698,7 @@ Assets are represented by the `Asset` object type in the Gridsome GraphQL schema
 
 The arguments accepted are (omit any of the arguments if you do not wish to use it):
 
-| Name | Type | Equivalent `ImageUrlBuilder` method name | Notes |
+| Name | Type | Equivalent `ImageUrlBuilder` function name | Notes |
 | --- | --- | --- | --- |
 | `width` | `Int` | `withWidth` | Specify the desired width in pixels |
 | `height` | `Int` | `withHeight` | Specify the desired height in pixels |
@@ -708,7 +708,7 @@ The arguments accepted are (omit any of the arguments if you do not wish to use 
 | `quality` | `Int` | `withQuality` | Specify a value in the range of 0 to 100 |
 | `dpr` | `Int` | `withDpr` | Specify a value in the range of 1 to 5 |
 
-> There are currently no arguments that are equivalent to the following methods of the `ImageUrlBuilder`:
+> There are currently no arguments that are equivalent to the following functions of the `ImageUrlBuilder`:
 > * `withCustomParam`
 > * `withRectangleCrop`
 > * `withFocalPointCrop`
@@ -769,10 +769,10 @@ To do this we must first create a custom content model somewhere in our applicat
 const { GridsomeContentItem } = require('@meeg/gridsome-source-kentico-cloud');
 
 class PostContentItem extends GridsomeContentItem {
-  // Override the `addFields` method - this is called after all "system" fields are set
+  // Override the `addFields` function - this is called after all "system" fields are set
   addFields(node) {
     /*
-    Call the `addFields` method of the base class - we want the default behaviour to run
+    Call the `addFields` function of the base class - we want the default behaviour to run
     first, and then we will manipulate the data to enforce our custom behaviour
     */
     super.addFields(node);
@@ -860,7 +860,7 @@ There could be any number of scenarios in which you may wish to extend `Gridsome
 
 #### Set a field value based on linked content items
 
-We saw earlier that you can [extend how field data is set](#extending-gridsomecontentitem) within a content model by overriding the `addFields` method. The `addFields` method receives a `node` object that represents the data from a single content item from Kentico Cloud transformed into a data structure that will be used to populate the Gridsome GraphQL data store.
+We saw earlier that you can [extend how field data is set](#extending-gridsomecontentitem) within a content model by overriding the `addFields` function. The `addFields` function receives a `node` object that represents the data from a single content item from Kentico Cloud transformed into a data structure that will be used to populate the Gridsome GraphQL data store.
 
 In the previous example we used the `item` property of the `node` to get and set field values, but the `node` object has other properties that can be used when manipulating field data.
 
