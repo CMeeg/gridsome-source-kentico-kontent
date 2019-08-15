@@ -856,7 +856,55 @@ module.exports = {
 
 ### Other scenarios
 
-There could be any number of scenarios in which you may wish to extend `GridsomeContentItem`, but here are a couple more examples.
+There could be any number of scenarios in which you may wish to extend `GridsomeContentItem`, but here are a few more examples of ways in which you can extend content models.
+
+#### Overriding field resolvers
+
+The `addFields` function seen [earlier](#extending-gridsomecontentitem) effectively loops through each content element defined on the field type and:
+
+* Attempts to find and execute an instance function named `${fieldName}FieldResolver` where `fieldName` is the codename of the content element converted to camel case; and if none is found
+* Attempts to find and execute an instance function named `${fieldType}TypeFieldResolver` where `fieldType` is the type of the content element converted to camel case; and if none is found
+* Executes an instance function named `defaultFieldResolver`
+
+The function that is executed receives a `node` and `field` as arguments:
+
+* `node` represents the data that will eventually be inserted into the Gridsome GraphQL data store
+* `field` represents the content element data that has come from Kentico Cloud
+
+The responsibility of the function is to set a value on the `node` that will contain the data from the `field` transformed into whatever format is deemed suitable for the Gridsome GraphQL data store.
+
+Field resolvers can be used like this:
+
+```javascript
+const { GridsomeContentItem } = require('@meeg/gridsome-source-kentico-cloud');
+
+class PostContentItem extends GridsomeContentItem {
+  // This function will be used when resolving the "author" content element of this type
+  authorFieldResolver(node, field) {
+    const fieldName = field.fieldName;
+    const value = field.value;
+
+    // This is a pretty contrived example, but hopefully illustrates the point!
+    if (!value) {
+      value = 'Joe Bloggs';
+    }
+
+    this.addField(node, fieldName, value);
+  }
+
+  // This function will be used when resolving all "Multiple choice" content elements of this type
+  multipleChoiceTypeFieldResolver(node, field) {
+    const fieldName = field.fieldName;
+
+    // By default this value would be an object containing `name` and `codename` properties, but we just want `name`
+    const value = field.value.name;
+
+    this.addField(node, fieldName, value);
+  }
+}
+
+module.exports = PostContentItem;
+```
 
 #### Set a field value based on linked content items
 
