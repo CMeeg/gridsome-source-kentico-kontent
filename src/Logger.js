@@ -1,15 +1,10 @@
 const debug = require('debug');
 
 class Logger {
-  constructor(namespace, options) {
+  constructor(namespace) {
     this.namespace = namespace;
-    this.options = options;
 
     this.logger = debug(namespace);
-
-    if (options.enable) {
-      debug.enable(options.enable);
-    }
   }
 
   log(message, ...args) {
@@ -19,7 +14,7 @@ class Logger {
   extend(namespace) {
     const contextNamespace = `${this.namespace}:${namespace}`;
 
-    return new Logger(contextNamespace, this.options);
+    return new Logger(contextNamespace);
   }
 }
 

@@ -38,6 +38,8 @@ class GridsomeTaxonomyItem {
     let slug = slugify(term.codename);
 
     if (node.slug) {
+      // The "parent" term node has a slug so we need to include that
+      // when forming the slug for this term
       slug = `${node.slug}/${slug}`;
     }
 
