@@ -1,6 +1,6 @@
 {
   "name": "@meeg/gridsome-source-kentico-cloud",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Kentico Cloud data source plugin for Gridsome.",
   "author": "Chris Meagher",
   "license": "MIT",
@@ -34,7 +34,8 @@
     "eslint-plugin-import": "2.13.0",
     "eslint-plugin-node": "7.0.0",
     "eslint-plugin-promise": "4.0.0",
-    "eslint-plugin-standard": "4.0.0"
+    "eslint-plugin-standard": "4.0.0",
+    "standard-version": "^7.0.0"
   },
   "publishConfig": {
     "access": "public"
@@ -44,6 +45,13 @@
   },
   "scripts": {
     "lint": "eslint ./src",
-    "build": "yarn run lint"
+    "build": "yarn run lint",
+    "release": "standard-version"
+  },
+  "standard-version": {
+    "skip": {
+      "tag": true,
+      "commit": true
+    }
   }
 }

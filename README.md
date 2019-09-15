@@ -589,7 +589,7 @@ The default [route](https://gridsome.org/docs/routing) for all content objects a
 Where:
 
 * `codename` is the [slugified](https://github.com/sindresorhus/slugify) codename of the Kentico Cloud content type that the content belongs to; and
-* `slug` is the [system field](#system-fields) named "slug"
+* `slug` is the [system field](#system-fields) named "slug"; or if no such field is present the `name` system field is slugified
 
 It is possible to override the default route for each of your Kentico Cloud content types using the options exposed by this plugin. To do so you must add an item to the `contentItemConfig.routes` object with a key matching the content type codename you wish to specify the route for, and a value matching the desired route that you wish to use for that content type. For example:
 
@@ -612,6 +612,8 @@ plugins: [
   }
 }
 ```
+
+If you do not wish for a content type to have a route (and therefore no path i.e. to not represent a navigable page) then you can set the value of the route to `null`.
 
 > The route that you specify can use any [parameters](https://gridsome.org/docs/routing#route-params) that Gridsome can resolve.
 

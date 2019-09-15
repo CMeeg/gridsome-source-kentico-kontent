@@ -1,6 +1,7 @@
 const { ContentItem } = require('kentico-cloud-delivery');
 const changeCase = require('change-case');
 const { merge } = require('lodash');
+const slugify = require('@sindresorhus/slugify');
 
 class GridsomeContentItem extends ContentItem {
   constructor(typeName, route, richTextHtmlTransformer, data) {
@@ -81,6 +82,8 @@ class GridsomeContentItem extends ContentItem {
     // If the content item's id and name are the same, this is a Rich Text Component
 
     const isComponent = id === name;
+    const nodeRoute = isComponent ? null : this.route;
+    const defaultSlug = nodeRoute ? slugify(name) : null;
 
     // Initialise a content node with fields from system data, which should be consistent across all nodes in Gridsome
 
@@ -92,10 +95,10 @@ class GridsomeContentItem extends ContentItem {
         languageCode,
         type,
         typeName: this.typeName,
-        route: isComponent ? null : this.route, // Components are not independent content and so will not have a route
+        route: nodeRoute, // Components are not independent content and so will not have a route
         isComponent: isComponent,
         date: new Date(lastModified),
-        slug: null // Will be overwritten if a `URL slug` type field is present on the content type
+        slug: defaultSlug // Will be overwritten if a `URL slug` type field is present on the content type
       },
       assetFields: [],
       linkedItemFields: [],

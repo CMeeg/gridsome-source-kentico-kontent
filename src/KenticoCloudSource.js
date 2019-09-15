@@ -246,7 +246,7 @@ class KenticoCloudSource {
 
         // Only add the asset node if it does not already exist in the collection
 
-        const existingNode = collection.getNode(id);
+        const existingNode = assetCollection.getNode(id);
 
         if (existingNode === null) {
           this.logger.log('Creating Gridsome node for asset %o', asset);
