@@ -17,16 +17,16 @@
     "src/*.js"
   ],
   "dependencies": {
+    "@kentico/kontent-delivery": "^7.0.0",
     "@sindresorhus/slugify": "^0.9.1",
     "change-case": "^3.1.0",
     "cheerio": "^1.0.0-rc.3",
     "debug": "^4.1.1",
-    "kentico-cloud-delivery": "^5.7.2",
     "lodash": "^4.17.15",
     "rxjs": "^6.5.2"
   },
   "peerDependencies": {
-    "gridsome": "^0.6.7"
+    "gridsome": "~0.6.7"
   },
   "devDependencies": {
     "eslint": "^5.16.0",

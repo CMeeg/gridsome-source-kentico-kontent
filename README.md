@@ -970,11 +970,11 @@ class PostSeriesContentItem extends GridsomeContentItem {
 module.exports = PostSeriesContentItem;
 ```
 
-> When you are inside an instance function such as `addFields` you also have access to all of the properties of a regular `ContentItem` such as `this.system` and `this.elements` should you need them.
+> When you are inside an instance function such as `addFields` you also have access to all of the properties of a regular `ContentItem` such as `this.system` and `this._raw.elements` should you need them.
 
 #### Custom Rich Text and Link resolvers
 
-`GridsomeContentItem` uses custom [richTextResolver](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#globally) and [linkResolver](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#resolving-url-slugs-globally) functions to aid in the approach for [rendering Rich Text fields](#rendering-rich-text-fields), but if you decide to [opt out](#opting-out-of-this-approach) of that approach you may want to provide your own resolver functions.
+`GridsomeContentItem` uses custom [richTextResolver](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#globally) and [urlSlugResolver](https://github.com/Kentico/kentico-kontent-js/blob/delivery%406.2.0/packages/delivery/DOCS.md#resolving-url-slugs-globally) functions to aid in the approach for [rendering Rich Text fields](#rendering-rich-text-fields), but if you decide to [opt out](#opting-out-of-this-approach) of that approach you may want to provide your own resolver functions.
 
 You can do so like this:
 
@@ -992,8 +992,8 @@ class PostContentItem extends GridsomeContentItem {
         richTextResolver: (item, context) => {
           return `<h3 class="resolved-item">${item.name.text}</h3>`;
         },
-        linkResolver: (link, context) => {
-          return `/posts/${url_slug}`;
+        urlSlugResolver: (link, context) => {
+          return { url: `/posts/${url_slug}` };
         }
     };
 
@@ -1049,9 +1049,9 @@ These options are identical to the Kentico Cloud delivery client configuration o
 
 | Key | Type | Default value | Notes |
 | --- | --- | --- | --- |
-| `contentItemsDepth` | `Number` | `3` | Sets the `depth` parameter on content queries, which can be used to [handle missing referenced linked items](https://github.com/Kentico/kentico-cloud-js/blob/delivery%405.7.2/packages/delivery/DOCS.md#handling-missing-referenced-linked-items) |
+| `contentItemsDepth` | `Number` | `3` | Sets the `depth` parameter on content queries, which can be used to [handle missing referenced linked items](https://github.com/Kentico/kentico-kontent-js/blob/delivery%406.2.0/packages/delivery/DOCS.md#handling-missing-referenced-linked-items) |
 
-Please see the [Kentico Cloud documentation](https://github.com/Kentico/kentico-cloud-js/blob/delivery%405.7.2/packages/delivery/DOCS.md#client-configuration) for a description of all other available options, which include options for setting preview mode, secure mode, and language.
+Please see the [Kentico Cloud documentation](https://github.com/Kentico/kentico-kontent-js/blob/delivery%406.2.0/packages/delivery/DOCS.md#client-configuration) for a description of all other available options, which include options for setting preview mode, secure mode, and language.
 
 ### `contentItemConfig` options
 

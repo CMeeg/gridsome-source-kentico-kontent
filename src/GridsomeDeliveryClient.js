@@ -1,4 +1,4 @@
-const { TypeResolver, DeliveryClient } = require('kentico-cloud-delivery');
+const { TypeResolver, DeliveryClient } = require('@kentico/kontent-delivery');
 
 class GridsomeDeliveryClient {
   constructor(deliveryClientConfig) {
@@ -40,7 +40,7 @@ class GridsomeDeliveryClient {
 
     const contentTypes = await deliveryClient
       .types()
-      .getPromise();
+      .toPromise();
 
     return contentTypes;
   }
@@ -53,7 +53,7 @@ class GridsomeDeliveryClient {
       .items()
       .type(codename)
       .depthParameter(depth)
-      .getPromise();
+      .toPromise();
 
     return contentItems;
   }
@@ -63,7 +63,7 @@ class GridsomeDeliveryClient {
 
     const taxonomyGroups = await deliveryClient
       .taxonomies()
-      .getPromise();
+      .toPromise();
 
     return taxonomyGroups;
   }
