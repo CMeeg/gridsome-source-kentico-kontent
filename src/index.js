@@ -1,11 +1,11 @@
 const DeliveryClient = require('./GridsomeDeliveryClient');
-const KenticoCloudSource = require('./KenticoCloudSource');
+const KenticoKontentSource = require('./KenticoKontentSource');
 const GridsomeContentItemFactory = require('./GridsomeContentItemFactory');
 const GridsomeContentItem = require('./GridsomeContentItem');
 const GridsomeTaxonomyItemFactory = require('./GridsomeTaxonomyItemFactory');
 const Logger = require('./Logger');
 
-class KenticoCloudSourcePlugin {
+class KenticoKontentSourcePlugin {
   static defaultOptions() {
     return {
       deliveryClientConfig: {
@@ -36,28 +36,28 @@ class KenticoCloudSourcePlugin {
   };
 
   constructor(api, options) {
-    const logger = new Logger('gridsome-source-kentico-cloud');
+    const logger = new Logger('gridsome-source-kentico-kontent');
 
     api.loadSource(async store => {
       const deliveryClient = new DeliveryClient(options.deliveryClientConfig);
       const contentItemFactory = new GridsomeContentItemFactory(options.contentItemConfig);
       const taxonomyItemFactory = new GridsomeTaxonomyItemFactory(options.taxonomyConfig);
 
-      const kenticoCloudSource = new KenticoCloudSource(
+      const kenticoKontentSource = new KenticoKontentSource(
         deliveryClient,
         contentItemFactory,
         taxonomyItemFactory,
         logger
       );
 
-      logger.log('Started loading content from Kentico Cloud');
+      logger.log('Started loading content from Kentico Kontent');
 
-      await kenticoCloudSource.load(store);
+      await kenticoKontentSource.load(store);
 
-      logger.log('Finished loading content from Kentico Cloud');
+      logger.log('Finished loading content from Kentico Kontent');
     });
   }
 }
 
-module.exports = KenticoCloudSourcePlugin;
+module.exports = KenticoKontentSourcePlugin;
 module.exports.GridsomeContentItem = GridsomeContentItem;

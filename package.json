@@ -1,17 +1,18 @@
 {
-  "name": "@meeg/gridsome-source-kentico-cloud",
+  "name": "@meeg/gridsome-source-kentico-kontent",
   "version": "0.1.1",
-  "description": "Kentico Cloud data source plugin for Gridsome.",
+  "description": "Kentico Kontent data source plugin for Gridsome.",
   "author": "Chris Meagher",
   "license": "MIT",
-  "homepage": "https://github.com/CMeeg/gridsome-source-kentico-cloud#readme",
-  "repository": "https://github.com/CMeeg/gridsome-source-kentico-cloud.git",
+  "homepage": "https://github.com/CMeeg/gridsome-source-kentico-kontent#readme",
+  "repository": "https://github.com/CMeeg/gridsome-source-kentico-kontent.git",
   "main": "src/index.js",
   "keywords": [
     "gridsome",
     "gridsome-plugin",
     "gridsome-source",
-    "kentico-cloud"
+    "kentico-kontent",
+    "kontent"
   ],
   "files": [
     "src/*.js"

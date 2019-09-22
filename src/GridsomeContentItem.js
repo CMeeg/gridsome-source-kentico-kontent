@@ -19,8 +19,7 @@ class GridsomeContentItem extends ContentItem {
 
     if (richTextHtmlTransformer.canTransformLinks()) {
       defaultData.urlSlugResolver = (link, context) => {
-        // TODO: Ask Kentico Cloud why this seems to be being ignored
-        // TODO: Does this now work?
+        // TODO: This doesn't always appear to get called - raise issue with Kentico Kontent when have repro steps
         // Removing this results in warnings from the DeliveryClient when advanced logging is turned on
         return this.resolveLink(link, context);
       };
@@ -120,7 +119,7 @@ class GridsomeContentItem extends ContentItem {
       if (element.type === 'asset') {
         field.value = field.value.map(asset => {
           // We will use the asset url as the id as it is unique, and the id is not provided
-          // TODO: Ask Kentico Cloud if it can be provided
+          // TODO: Raise issue with Kentico Kontent to ask if asset ids can be provided
 
           asset.id = asset.url;
 

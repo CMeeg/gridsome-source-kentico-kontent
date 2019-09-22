@@ -1,6 +1,6 @@
 const { ImageUrlBuilder, ImageCompressionEnum, ImageFormatEnum } = require('@kentico/kontent-delivery');
 
-class KenticoCloudSource {
+class KenticoKontentSource {
   constructor(deliveryClient, contentItemFactory, taxonomyItemFactory, logger) {
     this.deliveryClient = deliveryClient;
     this.contentItemFactory = contentItemFactory;
@@ -399,4 +399,4 @@ class KenticoCloudSource {
   }
 }
 
-module.exports = KenticoCloudSource;
+module.exports = KenticoKontentSource;
