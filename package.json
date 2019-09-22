@@ -36,6 +36,7 @@
     "eslint-plugin-node": "7.0.0",
     "eslint-plugin-promise": "4.0.0",
     "eslint-plugin-standard": "4.0.0",
+    "genversion": "^2.2.0",
     "standard-version": "^7.0.0"
   },
   "publishConfig": {
@@ -46,7 +47,7 @@
   },
   "scripts": {
     "lint": "eslint ./src",
-    "build": "yarn run lint",
+    "build": "genversion ./src/genversion.js -s && yarn run lint",
     "release": "standard-version"
   },
   "standard-version": {

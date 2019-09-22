@@ -39,7 +39,7 @@ class KenticoKontentSourcePlugin {
     const logger = new Logger('gridsome-source-kentico-kontent');
 
     api.loadSource(async store => {
-      const deliveryClient = new DeliveryClient(options.deliveryClientConfig);
+      const deliveryClient = new DeliveryClient(options.deliveryClientConfig, logger);
       const contentItemFactory = new GridsomeContentItemFactory(options.contentItemConfig);
       const taxonomyItemFactory = new GridsomeTaxonomyItemFactory(options.taxonomyConfig);
 

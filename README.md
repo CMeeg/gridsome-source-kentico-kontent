@@ -1013,8 +1013,9 @@ The plugin defines the following namespaces:
 
 | Namespace | Description |
 | --- | --- |
-| `gridsome-source-kentico-kontent` | Use this to log very basic info about when the plugin starts and finishes its work |
-| `gridsome-source-kentico-kontent:source` | Use this to log detailed information about the work that the plugin is doing |
+| `gridsome-source-kentico-kontent` | Use this to log basic info about when the plugin starts and finishes its work |
+| `gridsome-source-kentico-kontent:source` | Use this to log information about the work that the plugin is doing |
+| `gridsome-source-kentico-kontent:delivery-client` | Use this to log information from the Kentico Kontent delivery client |
 
 Please read the debug docs for usage instructions.
 
