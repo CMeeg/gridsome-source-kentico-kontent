@@ -1,6 +1,6 @@
-const { ImageUrlBuilder, ImageCompressionEnum, ImageFormatEnum } = require('kentico-cloud-delivery');
+const { ImageUrlBuilder, ImageCompressionEnum, ImageFormatEnum } = require('@kentico/kontent-delivery');
 
-class KenticoCloudSource {
+class KenticoKontentSource {
   constructor(deliveryClient, contentItemFactory, taxonomyItemFactory, logger) {
     this.deliveryClient = deliveryClient;
     this.contentItemFactory = contentItemFactory;
@@ -113,7 +113,8 @@ class KenticoCloudSource {
     const codename = contentType.system.codename;
 
     const content = await this.deliveryClient.getContent(codename);
-    const { items: contentItems, linkedItems } = content;
+    const { items: contentItems } = content;
+    const linkedItems = Object.keys(content.linkedItems).map(key => content.linkedItems[key]);
 
     if (contentItems.length === 0) {
       // There are no content items to process so we go no further
@@ -398,4 +399,4 @@ class KenticoCloudSource {
   }
 }
 
-module.exports = KenticoCloudSource;
+module.exports = KenticoKontentSource;
