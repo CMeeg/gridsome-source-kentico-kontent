@@ -1,6 +1,6 @@
 {
   "name": "@meeg/gridsome-source-kentico-cloud",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Kentico Cloud data source plugin for Gridsome.",
   "author": "Chris Meagher",
   "license": "MIT",
@@ -26,7 +26,7 @@
     "rxjs": "^6.5.2"
   },
   "peerDependencies": {
-    "gridsome": "^0.6.7"
+    "gridsome": "~0.6.7"
   },
   "devDependencies": {
     "eslint": "^5.16.0",

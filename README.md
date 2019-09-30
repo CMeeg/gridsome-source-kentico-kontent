@@ -1,5 +1,7 @@
 # @meeg/gridsome-source-kentico-cloud
 
+> This plugin currently does not support Gridsome >= 0.7.0. Support will be coming as soon as possible.
+
 A [Kentico Cloud](https://kenticocloud.com/) data source plugin for [Gridsome](https://gridsome.org/) that aims to support all of the main features of Kentico Cloud:
 
 ✔ Content (including all content element types)\
