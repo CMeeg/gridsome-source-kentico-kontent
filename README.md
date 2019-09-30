@@ -1,48 +1,48 @@
-# @meeg/gridsome-source-kentico-cloud
+# @meeg/gridsome-source-kentico-kontent
 
 > This plugin currently does not support Gridsome >= 0.7.0. Support will be coming as soon as possible.
 
-A [Kentico Cloud](https://kenticocloud.com/) data source plugin for [Gridsome](https://gridsome.org/) that aims to support all of the main features of Kentico Cloud:
+A [Kentico Kontent](https://kontent.ai/) data source plugin for [Gridsome](https://gridsome.org/) that aims to support all of the main features of Kentico Kontent:
 
 ✔ Content (including all content element types)\
 ✔ Taxonomy\
 ✔ Assets
 
-The plugin also provides additional features and extension points to ease working with your Kentico Cloud content in Gridsome. Please keep reading to learn about:
+The plugin also provides additional features and extension points to ease working with your Kentico Kontent content in Gridsome. Please keep reading to learn about:
 
 * How to [get started](#getting-started) with this plugin
-* The object types and object models that are added to the Gridsome [GraphQL schema](#kentico-cloud-graphql-schema) by this plugin
+* The object types and object models that are added to the Gridsome [GraphQL schema](#kentico-kontent-graphql-schema) by this plugin
 * How to [render Rich Text fields](#rendering-rich-text-fields) using Vue single file components that you define in your app
 * How to [customise routing](#routing) of content and taxonomy objects
 * How to [work with Taxonomy](#working-with-taxonomy-in-gridsome) in Gridsome
 * How to [work with Assets](#working-with-assets-in-gridsome) in Gridsome, and how to transform Asset URLs directly in your GraphQL queries
-* How to [create content models](#creating-content-models) to allow you to customise how content from Kentico Cloud is represented as data in Gridsome
+* How to [create content models](#creating-content-models) to allow you to customise how content from Kentico Kontent is represented as data in Gridsome
 * The full list of plugin [configuration options](#configuration)
 
 ---
 
 ## Getting started
 
-> This getting started guide assumes that you have an existing Gridsome project, and that you want to add Kentico Cloud as a data source using this plugin. If you haven't yet created a Gridsome project, please follow the [Gridsome getting started guide](https://gridsome.org/docs) first and then come back here.
+> This getting started guide assumes that you have an existing Gridsome project, and that you want to add Kentico Kontent as a data source using this plugin. If you haven't yet created a Gridsome project, please follow the [Gridsome getting started guide](https://gridsome.org/docs) first and then come back here.
 
 ### Install
 
-Use your preferred package manager to add a dependency on `@meeg/gridsome-source-kentico-cloud` to your Gridsome app, for example:
+Use your preferred package manager to add a dependency on `@meeg/gridsome-source-kentico-kontent` to your Gridsome app, for example:
 
-* `yarn add @meeg/gridsome-source-kentico-cloud`
-* `npm install @meeg/gridsome-source-kentico-cloud`
+* `yarn add @meeg/gridsome-source-kentico-kontent`
+* `npm install @meeg/gridsome-source-kentico-kontent`
 
 ### Add and configure the plugin
 
-Add `@meeg/gridsome-source-kentico-cloud` to the plugins array in your `gridsome.config.js` file, and configure the Kentico Cloud delivery client to fetch data from your [project](https://docs.kenticocloud.com/tutorials/set-up-projects/manage-projects/adding-projects) by specifying your project id in the plugin options:
+Add `@meeg/gridsome-source-kentico-kontent` to the plugins array in your `gridsome.config.js` file, and configure the Kentico Kontent delivery client to fetch data from your [project](https://docs.kontent.ai/tutorials/set-up-projects/manage-projects/adding-projects) by specifying your project id in the plugin options:
 
 ```javascript
 plugins: [
   {
-    use: '@meeg/gridsome-source-kentico-cloud',
+    use: '@meeg/gridsome-source-kentico-kontent',
     options: {
       deliveryClientConfig: {
-        projectId: process.env.KENTICO_CLOUD_PROJECT_ID
+        projectId: process.env.KENTICO_KONTENT_PROJECT_ID
       }
     }
   }
@@ -116,7 +116,7 @@ export default {
 
 ### Query and render your content
 
-From this point on you are ready to work with your Kentico Cloud content as data in Gridsome 😎
+From this point on you are ready to work with your Kentico Kontent content as data in Gridsome 😎
 
 > If you are new to Gridsome, the following areas of the [docs](https://gridsome.org/docs) should help you get up and running with data:
 >
@@ -132,9 +132,9 @@ From this point on you are ready to work with your Kentico Cloud content as data
 
 ---
 
-## Kentico Cloud GraphQL schema
+## Kentico Kontent GraphQL schema
 
-The following types of data are sourced from Kentico Cloud and made available for querying via the Gridsome GraphQL data store:
+The following types of data are sourced from Kentico Kontent and made available for querying via the Gridsome GraphQL data store:
 
 * [Content objects](#content-objects)
 * [Taxonomy objects](#taxonomy-objects)
@@ -142,7 +142,7 @@ The following types of data are sourced from Kentico Cloud and made available fo
 
 ### Content objects
 
-Content is available by querying against object types named using the codename of the [content type](https://docs.kenticocloud.com/tutorials/set-up-projects/define-content-models/creating-and-deleting-content-types) they belong to converted to pascal case. For example:
+Content is available by querying against object types named using the codename of the [content type](https://docs.kontent.ai/tutorials/set-up-projects/define-content-models/creating-and-deleting-content-types) they belong to converted to pascal case. For example:
 
 * Given the codename `article`, the object type will be named `Article`
 * Given the codename `landing_page`, the object type will be named `LandingPage`
@@ -153,7 +153,7 @@ Content is available by querying against object types named using the codename o
 
 Every content object type shares a core set of fields that include:
 
-* System fields provided by the Kentico Cloud delivery client
+* System fields provided by the Kentico Kontent delivery client
 * Fields required by this plugin
 * Fields required by Gridsome
 
@@ -161,21 +161,21 @@ As such, every content object has at least the following fields:
 
 | Name | Type | Notes |
 | --- | --- | --- |
-| `id` | `String` | Kentico Cloud's id is used as the object's id |
-| `name` | `String` | The name of the content item in Kentico Cloud |
-| `codename` | `String` | The codename of the content item in Kentico Cloud |
+| `id` | `String` | Kentico Kontent's id is used as the object's id |
+| `name` | `String` | The name of the content item in Kentico Kontent |
+| `codename` | `String` | The codename of the content item in Kentico Kontent |
 | `languageCode` | `String` | The language codename of the content item |
-| `type` | `String` | The codename of the content type in Kentico Cloud  that this content item belongs to |
+| `type` | `String` | The codename of the content type in Kentico Kontent  that this content item belongs to |
 | `typeName` | `String` | The GraphQL object type name |
 | `route` | `String` | The [route](#content-routing) defined for this object type - if this object's `isComponent` field is `true`, this will always be `null` |
 | `isComponent` | `Boolean` | `true` if this object represents a content component; otherwise `false` - see the section on [content component objects](#content-component-objects) for further details |
-| `date` | `Date` | This is equal to the Kentico Cloud `last_modified` date, but is named `date` because that is the convention in Gridsome |
+| `date` | `Date` | This is equal to the Kentico Kontent `last_modified` date, but is named `date` because that is the convention in Gridsome |
 | `slug` | `String` | This is set to the value of the "URL slug" content element if one is defined on the content type that this content belongs to; otherwise `null` |
 | `path` | `String` | This is the path generated by Gridsome and is based on the route defined for this object type |
 
 #### Content element fields
 
-As well as system fields, each object type contains fields that represent each of the content elements of the Kentico Cloud content type that the content belongs to.
+As well as system fields, each object type contains fields that represent each of the content elements of the Kentico Kontent content type that the content belongs to.
 
 These fields are named using the codename of the corresponding content element converted to camel case. For example:
 
@@ -184,9 +184,9 @@ These fields are named using the codename of the corresponding content element c
 
 > If there is a collision of field name a positive auto-incremented integer will be added as a suffix to the field name.
 >
-> For example, a Kentico Cloud content type has a content element with the codename `date` that will collide with the "system" `date` field so it will receive the field name `date1` when added to the corresponding object type in the GraphQL schema.
+> For example, a Kentico Kontent content type has a content element with the codename `date` that will collide with the "system" `date` field so it will receive the field name `date1` when added to the corresponding object type in the GraphQL schema.
 
-All types of content element available in Kentico Cloud are supported and are represented in the object type definition as fields:
+All types of content element available in Kentico Kontent are supported and are represented in the object type definition as fields:
 
 | Content element | Type | Notes |
 | --- | --- | --- |
@@ -205,7 +205,7 @@ All types of content element available in Kentico Cloud are supported and are re
 
 #### Content component objects
 
-Content [components](https://docs.kenticocloud.com/tutorials/write-and-collaborate/structure-your-content/structuring-editorial-articles-with-components) used in Rich Text fields are also added to object types in the Gridsome GraphQL schema.
+Content [components](https://docs.kontent.ai/tutorials/write-and-collaborate/structure-your-content/structuring-editorial-articles-with-components) used in Rich Text fields are also added to object types in the Gridsome GraphQL schema.
 
 The difference between content component objects and "regular" content objects is that content component objects will never have values in their `route` or `path` fields because they are components of larger pieces of content and therefore not intended to be used in isolation.
 
@@ -215,7 +215,7 @@ The `isComponent` system field can be used to filter content component objects i
 
 > Item links are primarily used when [rendering Rich Text fields](#rendering-rich-text-fields) so feel free to skip this section unless you really want to read it! 🤓
 
-When editing content inside Rich Text elements in Kentico Cloud you can [add links to other content items](https://docs.kenticocloud.com/tutorials/write-and-collaborate/write-content/composing-content-in-the-rich-text-editor#a-adding-links) within your Kentico Cloud project. To resolve these links within your Gridsome app, the `path` of the content item that has been linked to must be used as the URL of the link.
+When editing content inside Rich Text elements in Kentico Kontent you can [add links to other content items](https://docs.kontent.ai/tutorials/write-and-collaborate/write-content/composing-content-in-the-rich-text-editor#a-adding-links) within your Kentico Kontent project. To resolve these links within your Gridsome app, the `path` of the content item that has been linked to must be used as the URL of the link.
 
 Gridsome generates the `path` value for an object (based on a [defined](#content-routing) `route`) when it is inserted into the GraphQL data store via the [Data Store API](https://gridsome.org/docs/data-store-api#collectionaddnodeoptions).
 
@@ -230,7 +230,7 @@ The `ItemLink` object type has these fields:
 
 | Name | Type | Notes |
 | --- | --- | --- |
-| `id` | String | Kentico Cloud's id and the id of the corresponding content object |
+| `id` | String | Kentico Kontent's id and the id of the corresponding content object |
 | `typeName` | String | The GraphQL object type name of the corresponding content object  |
 | `path` | String | The path of the corresponding content object |
 
@@ -238,7 +238,7 @@ The `ItemLink` object type has these fields:
 
 ### Taxonomy objects
 
-Taxonomy terms are available by querying against object types named using the codename of the [taxonomy group](https://docs.kenticocloud.com/tutorials/set-up-projects/define-content-models/organizing-your-content-with-taxonomies) they belong to converted to pascal case, and prefixed with "Taxonomy". For example:
+Taxonomy terms are available by querying against object types named using the codename of the [taxonomy group](https://docs.kontent.ai/tutorials/set-up-projects/define-content-models/organizing-your-content-with-taxonomies) they belong to converted to pascal case, and prefixed with "Taxonomy". For example:
 
 * Given the taxonomy group codename `tag`, the object type will be named `TaxonomyTag`
 * Given the taxonomy group codename `article_topics`, the object type will be named `TaxonomyArticleTopics`
@@ -249,7 +249,7 @@ Taxonomy terms are available by querying against object types named using the co
 
 Taxonomy term object types share a core set of fields that include:
 
-* System fields provided by the Kentico Cloud delivery client
+* System fields provided by the Kentico Kontent delivery client
 * Fields required by this plugin
 * Fields required by Gridsome
 
@@ -257,8 +257,8 @@ As such, every taxonomy term object has the following fields:
 
 | Name | Type | Notes |
 | --- | --- | --- |
-| `id` | `String` | The codename of the taxonomy term in Kentico Cloud is used as the object's id |
-| `name` | `String` | The name of the taxonomy term in Kentico Cloud |
+| `id` | `String` | The codename of the taxonomy term in Kentico Kontent is used as the object's id |
+| `name` | `String` | The name of the taxonomy term in Kentico Kontent |
 | `slug` | `String` | A slug is generated so that it can be used when specifying [routes](#taxonomy-routing) for object types |
 | `terms` | `<Taxonomy>[]` | Taxonomy terms can have child terms, which are an array of references to [taxonomy objects](#taxonomy-objects) |
 | `path` | `String` | If a [route](#taxonomy-routing) has been specified for this taxonomy object type Gridsome will generate a path for each object belonging to that type; otherwise the path will be `undefined` |
@@ -267,13 +267,13 @@ As such, every taxonomy term object has the following fields:
 
 ### Asset objects
 
-[Assets](https://docs.kenticocloud.com/tutorials/write-and-collaborate/manage-assets/viewing-all-your-project-s-assets) are available by querying against an object type named `Asset`.
+[Assets](https://docs.kontent.ai/tutorials/write-and-collaborate/manage-assets/viewing-all-your-project-s-assets) are available by querying against an object type named `Asset`.
 
 🙋 See the section on [configuration](#configuration) for options on how to customise naming of the asset object type.
 
 #### Asset fields
 
-Every asset object has the following fields provided by the Kentico Cloud delivery client:
+Every asset object has the following fields provided by the Kentico Kontent delivery client:
 
 | Name | Type | Notes |
 | --- | --- | --- |
@@ -293,7 +293,7 @@ A Rich Text field is a string containing HTML markup, and that HTML markup can c
 
 * Anchor links to other content that require resolving the link URL to the actual URL within your application
 * Assets such as images that may require some flexibility in rendering (such as the use of lazy loading and/or `srcset` and `sizes`)
-* Custom elements that represent [content components](https://docs.kenticocloud.com/tutorials/write-and-collaborate/structure-your-content/structuring-editorial-articles-with-components)
+* Custom elements that represent [content components](https://docs.kontent.ai/tutorials/write-and-collaborate/structure-your-content/structuring-editorial-articles-with-components)
 
 As briefly touched on in the [getting started](#configure-gridsome-to-resolve-rich-text-fields-using-vue-single-file-components) guide, the recommended way to render Rich Text fields when using this plugin is to use a Vue single file component to represent a Rich Text field, which will:
 
@@ -471,7 +471,7 @@ Now if the Rich Text field HTML passed in the `html` prop of the `RichText` comp
 
 ### Rendering content components in Rich Text fields
 
-First add a query to your `RichText` component inside a `<static-query>` block that will fetch all `<Content>` objects. The alias for `all<Content>` must match the codename of the Kentico Cloud content type that the `<Content>` belongs to:
+First add a query to your `RichText` component inside a `<static-query>` block that will fetch all `<Content>` objects. The alias for `all<Content>` must match the codename of the Kentico Kontent content type that the `<Content>` belongs to:
 
 > In the following examples, we will create a component to render code snippets, so the `<Content>` object type is `CodeSnippet` and content type codename is `code_snippet`:
 
@@ -558,7 +558,7 @@ For example:
 ```javascript
 plugins: [
   {
-    use: '@meeg/gridsome-source-kentico-cloud',
+    use: '@meeg/gridsome-source-kentico-kontent',
     options: {
       ...
       contentItemConfig: {
@@ -574,13 +574,13 @@ plugins: [
 }
 ```
 
-If you opt out of this approach you can use features of the Kentico Cloud delivery client to resolve [content links](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#url-slugs-links) and [content components](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#resolving-content-items-and-components-in-rich-text-elements), but not assets. These features of the delivery client are exposed by this plugin when [creating content models](#creating-content-models).
+If you opt out of this approach you can use features of the Kentico Kontent delivery client to resolve [content links](https://github.com/Kentico/kentico-kontent-js/blob/delivery%406.2.0/packages/delivery/DOCS.md#url-slugs-links) and [content components](https://github.com/Kentico/kentico-kontent-js/blob/delivery%406.2.0/packages/delivery/DOCS.md#resolving-content-items-and-components-in-rich-text-elements), but not assets. These features of the delivery client are exposed by this plugin when [creating content models](#creating-content-models).
 
 🙋 See the section on [configuration](#configuration) for options on how to customise Rich Text transformation.
 
 ## Routing
 
-The Kentico Cloud plugin will add routes for all [content types](#content-routing) in your project, and can optionally add routes for [taxonomy groups](#taxonomy-routing).
+The Kentico Kontent plugin will add routes for all [content types](#content-routing) in your project, and can optionally add routes for [taxonomy groups](#taxonomy-routing).
 
 #### Content routing
 
@@ -590,15 +590,15 @@ The default [route](https://gridsome.org/docs/routing) for all content objects a
 
 Where:
 
-* `codename` is the [slugified](https://github.com/sindresorhus/slugify) codename of the Kentico Cloud content type that the content belongs to; and
+* `codename` is the [slugified](https://github.com/sindresorhus/slugify) codename of the Kentico Kontent content type that the content belongs to; and
 * `slug` is the [system field](#system-fields) named "slug"; or if no such field is present the `name` system field is slugified
 
-It is possible to override the default route for each of your Kentico Cloud content types using the options exposed by this plugin. To do so you must add an item to the `contentItemConfig.routes` object with a key matching the content type codename you wish to specify the route for, and a value matching the desired route that you wish to use for that content type. For example:
+It is possible to override the default route for each of your Kentico Kontent content types using the options exposed by this plugin. To do so you must add an item to the `contentItemConfig.routes` object with a key matching the content type codename you wish to specify the route for, and a value matching the desired route that you wish to use for that content type. For example:
 
 ```javascript
 plugins: [
   {
-    use: '@meeg/gridsome-source-kentico-cloud',
+    use: '@meeg/gridsome-source-kentico-kontent',
     options: {
       ...
       contentItemConfig: {
@@ -625,12 +625,12 @@ If you do not wish for a content type to have a route (and therefore no path i.e
 
 There is no routing of Taxonomy objects by default.
 
-To define a route for a Kentico Cloud taxonomy group you must use the options exposed by this plugin. To do so you must add an item to the `taxonomyConfig.routes` object with a key matching the taxonomy group codename you wish to specify the route for, and a value matching the desired route that you wish to use for that taxonomy group. For example:
+To define a route for a Kentico Kontent taxonomy group you must use the options exposed by this plugin. To do so you must add an item to the `taxonomyConfig.routes` object with a key matching the taxonomy group codename you wish to specify the route for, and a value matching the desired route that you wish to use for that taxonomy group. For example:
 
 ```javascript
 plugins: [
   {
-    use: '@meeg/gridsome-source-kentico-cloud',
+    use: '@meeg/gridsome-source-kentico-kontent',
     options: {
       ...
       taxonomyConfig: {
@@ -657,9 +657,9 @@ The `slug` field is added to each taxonomy term object by this plugin and is gen
 
 The Gridsome documentation describes how to [create a taxonomy page](https://gridsome.org/docs/taxonomies) template to display a `Tag` object and the `Post` objects that reference that `Tag`.
 
-To achieve this with the Kentico Cloud plugin you will need to ensure that you first set up [routing](#taxonomy-routing) for the taxonomy group that you want to list (i.e. your equivalent of `Tag`), and then you can follow along with the documented approach.
+To achieve this with the Kentico Kontent plugin you will need to ensure that you first set up [routing](#taxonomy-routing) for the taxonomy group that you want to list (i.e. your equivalent of `Tag`), and then you can follow along with the documented approach.
 
-> The plugin will take care of adding the required references between [Taxonomy objects](#taxonomy-objects) (i.e. your equivalent of `Tag`) and [Content objects](#content-objects) (i.e. your equivalent of `Post`) via any [Taxonomy content elements](#content-element-fields) defined on the the Content object's content type in Kentico Cloud.
+> The plugin will take care of adding the required references between [Taxonomy objects](#taxonomy-objects) (i.e. your equivalent of `Tag`) and [Content objects](#content-objects) (i.e. your equivalent of `Post`) via any [Taxonomy content elements](#content-element-fields) defined on the the Content object's content type in Kentico Kontent.
 
 ### Other Taxonomy scenarios
 
@@ -699,7 +699,7 @@ query Tags {
 
 ## Working with Assets in Gridsome
 
-Assets are represented by the `Asset` object type in the Gridsome GraphQL schema and working with assets is largely the same as working with any other object type. The only "special" thing about `Asset` objects is that the `url` field accepts arguments that allow you to specify [image transformations](#https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#image-transformations) via a custom [field resolver](https://gridsome.org/docs/data-store-api#collectionaddschemafieldfieldname-fn) that uses the `ImageUrlBuilder` class provided by the Kentico Cloud delivery client.
+Assets are represented by the `Asset` object type in the Gridsome GraphQL schema and working with assets is largely the same as working with any other object type. The only "special" thing about `Asset` objects is that the `url` field accepts arguments that allow you to specify [image transformations](https://github.com/Kentico/kentico-kontent-js/blob/delivery%406.2.0/packages/delivery/DOCS.md#image-transformations) via a custom [field resolver](https://gridsome.org/docs/data-store-api#collectionaddschemafieldfieldname-fn) that uses the `ImageUrlBuilder` class provided by the Kentico Kontent delivery client.
 
 The arguments accepted are (omit any of the arguments if you do not wish to use it):
 
@@ -743,15 +743,15 @@ query Assets {
 
 ## Creating content models
 
-The default behaviour of this plugin when translating content from Kentico Cloud to objects in the [Gridsome GraphQL data store](#content-objects) should hopefully be sufficient in the majority of cases - a goal of the plugin is to allow consumers to get up and running with as little configuration as possible. However, the plugin does provide an extension point should you find yourself in a position where you want to modify the default behaviour.
+The default behaviour of this plugin when translating content from Kentico Kontent to objects in the [Gridsome GraphQL data store](#content-objects) should hopefully be sufficient in the majority of cases - a goal of the plugin is to allow consumers to get up and running with as little configuration as possible. However, the plugin does provide an extension point should you find yourself in a position where you want to modify the default behaviour.
 
-> Extending the translation of `Taxonomy` and `Asset` objects is not currently supported as those types are essentially comprised only of "system" fields and cannot be extended in Kentico Cloud; compared to content types that also have "system" fields, but are designed to be extended in Kentico Cloud by adding content elements.
+> Extending the translation of `Taxonomy` and `Asset` objects is not currently supported as those types are essentially comprised only of "system" fields and cannot be extended in Kentico Kontent; compared to content types that also have "system" fields, but are designed to be extended in Kentico Kontent by adding content elements.
 
-The majority of the work required to translate content from Kentico Cloud to the Gridsome GraphQL data store is performed via a custom `ContentItem` [model](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#creating-models) that is automatically passed to the delivery client as a [type resolver](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#initializing-deliveryclient).
+The majority of the work required to translate content from Kentico Kontent to the Gridsome GraphQL data store is performed via a custom `ContentItem` [model](https://github.com/Kentico/kentico-kontent-js/blob/delivery%406.2.0/packages/delivery/DOCS.md#creating-models) that is automatically passed to the delivery client as a [type resolver](https://github.com/Kentico/kentico-kontent-js/blob/delivery%406.2.0/packages/delivery/DOCS.md#initializing-deliveryclient).
 
-The default behaviour is to use the same content model for all Kentico Cloud content types. This content model is represented by the `GridsomeContentItem` class, which is a sub-class of `ContentItem`.
+The default behaviour is to use the same content model for all Kentico Kontent content types. This content model is represented by the `GridsomeContentItem` class, which is a sub-class of `ContentItem`.
 
-To modify the default behaviour you can create a new class that extends `GridsomeContentItem` and register it as the type resolver for one or more Kentico Cloud content types.
+To modify the default behaviour you can create a new class that extends `GridsomeContentItem` and register it as the type resolver for one or more Kentico Kontent content types.
 
 ### Extending `GridsomeContentItem`
 
@@ -759,7 +759,7 @@ For demonstration purposes we will use an example where we want to manipulate co
 
 This is our scenario:
 
-* There is a Kentico Cloud content type called `Post` that has a codename of `post`
+* There is a Kentico Kontent content type called `Post` that has a codename of `post`
 * The content type has a content element called `Date` with a codename of `date` that can be used to manually specify the date that the post was posted, with the intention being to fall back to the system last modified date if no `Date` value is specified
 * When this plugin runs it creates an object type in the Gridsome GraphQL schema named `Post`, but the field that represents the `Date` content element is called `date1` because it [collides](#content-element-fields) with the system `date` field
 
@@ -771,7 +771,7 @@ The goal is to:
 To do this we must first create a custom content model somewhere in our application that extends `GridsomeContentItem` and implements the desired behaviour:
 
 ```javascript
-const { GridsomeContentItem } = require('@meeg/gridsome-source-kentico-cloud');
+const { GridsomeContentItem } = require('@meeg/gridsome-source-kentico-kontent');
 
 class PostContentItem extends GridsomeContentItem {
   // Override the `addFields` function - this is called after all "system" fields are set
@@ -819,7 +819,7 @@ class PostContentItem extends GridsomeContentItem {
       return true;
     }
 
-    // If a date value is null in Kentico Cloud it can be parsed as a zero UTC date
+    // If a date value is null in Kentico Kontent it can be parsed as a zero UTC date
 
     return date.getTime() === 0;
   }
@@ -841,7 +841,7 @@ module.exports = {
   ...
   plugins: [
     {
-      use: '@meeg/gridsome-source-kentico-cloud',
+      use: '@meeg/gridsome-source-kentico-kontent',
       options: {
         ...
         contentItemConfig: {
@@ -874,14 +874,14 @@ The `addFields` function seen [earlier](#extending-gridsomecontentitem) effectiv
 The function that is executed receives a `node` and `field` as arguments:
 
 * `node` represents the data that will eventually be inserted into the Gridsome GraphQL data store
-* `field` represents the content element data that has come from Kentico Cloud
+* `field` represents the content element data that has come from Kentico Kontent
 
 The responsibility of the function is to set a value on the `node` that will contain the data from the `field` transformed into whatever format is deemed suitable for the Gridsome GraphQL data store.
 
 Field resolvers can be used like this:
 
 ```javascript
-const { GridsomeContentItem } = require('@meeg/gridsome-source-kentico-cloud');
+const { GridsomeContentItem } = require('@meeg/gridsome-source-kentico-kontent');
 
 class PostContentItem extends GridsomeContentItem {
   // This function will be used when resolving the "author" content element of this type
@@ -913,23 +913,23 @@ module.exports = PostContentItem;
 
 #### Set a field value based on linked content items
 
-We saw earlier that you can [extend how field data is set](#extending-gridsomecontentitem) within a content model by overriding the `addFields` function. The `addFields` function receives a `node` object that represents the data from a single content item from Kentico Cloud transformed into a data structure that will be used to populate the Gridsome GraphQL data store.
+We saw earlier that you can [extend how field data is set](#extending-gridsomecontentitem) within a content model by overriding the `addFields` function. The `addFields` function receives a `node` object that represents the data from a single content item from Kentico Kontent transformed into a data structure that will be used to populate the Gridsome GraphQL data store.
 
 In the previous example we used the `item` property of the `node` to get and set field values, but the `node` object has other properties that can be used when manipulating field data.
 
 For example, in this scenario:
 
-* We have a `Post series` content type in Kentico Cloud with a codename of `post_series`
+* We have a `Post series` content type in Kentico Kontent with a codename of `post_series`
 * The `Post series` content type has a "Linked items" content element called `Posts in series` with codename `posts_in_series`
 * `Posts in series` has a constraint requiring at least one linked item be set
 
 The goal is to:
 
-* Add a `lastUpdated` field to the corresponding `PostSeries` object type in the Gridsome GraphQL schema (there is no corresponding content element on the Kentico Cloud content type)
+* Add a `lastUpdated` field to the corresponding `PostSeries` object type in the Gridsome GraphQL schema (there is no corresponding content element on the Kentico Kontent content type)
 * Set the value of the `lastUpdated` field by getting the linked posts in its `postsInSeries` field, and using the most recent `date` value of the linked `Post` objects
 
 ```javascript
-const { GridsomeContentItem } = require('@meeg/gridsome-source-kentico-cloud');
+const { GridsomeContentItem } = require('@meeg/gridsome-source-kentico-kontent');
 
 class PostSeriesContentItem extends GridsomeContentItem {
   addFields(node) {
@@ -972,17 +972,17 @@ class PostSeriesContentItem extends GridsomeContentItem {
 module.exports = PostSeriesContentItem;
 ```
 
-> When you are inside an instance function such as `addFields` you also have access to all of the properties of a regular `ContentItem` such as `this.system` and `this.elements` should you need them.
+> When you are inside an instance function such as `addFields` you also have access to all of the properties of a regular `ContentItem` such as `this.system` and `this._raw.elements` should you need them.
 
 #### Custom Rich Text and Link resolvers
 
-`GridsomeContentItem` uses custom [richTextResolver](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#globally) and [linkResolver](https://github.com/Kentico/kentico-cloud-js/blob/master/packages/delivery/DOCS.md#resolving-url-slugs-globally) functions to aid in the approach for [rendering Rich Text fields](#rendering-rich-text-fields), but if you decide to [opt out](#opting-out-of-this-approach) of that approach you may want to provide your own resolver functions.
+`GridsomeContentItem` uses custom [richTextResolver](https://github.com/Kentico/kentico-kontent-js/blob/delivery%406.2.0/packages/delivery/DOCS.md#globally) and [urlSlugResolver](https://github.com/Kentico/kentico-kontent-js/blob/delivery%406.2.0/packages/delivery/DOCS.md#resolving-url-slugs-globally) functions to aid in the approach for [rendering Rich Text fields](#rendering-rich-text-fields), but if you decide to [opt out](#opting-out-of-this-approach) of that approach you may want to provide your own resolver functions.
 
 You can do so like this:
 
 ```javascript
 
-const { GridsomeContentItem } = require('@meeg/gridsome-source-kentico-cloud');
+const { GridsomeContentItem } = require('@meeg/gridsome-source-kentico-kontent');
 
 class PostContentItem extends GridsomeContentItem {
   // We need to override the constructor of `GridsomeContentItem`
@@ -994,8 +994,8 @@ class PostContentItem extends GridsomeContentItem {
         richTextResolver: (item, context) => {
           return `<h3 class="resolved-item">${item.name.text}</h3>`;
         },
-        linkResolver: (link, context) => {
-          return `/posts/${url_slug}`;
+        urlSlugResolver: (link, context) => {
+          return { url: `/posts/${url_slug}` };
         }
     };
 
@@ -1015,8 +1015,9 @@ The plugin defines the following namespaces:
 
 | Namespace | Description |
 | --- | --- |
-| `gridsome-source-kentico-cloud` | Use this to log very basic info about when the plugin starts and finishes its work |
-| `gridsome-source-kentico-cloud:source` | Use this to log detailed information about the work that the plugin is doing |
+| `gridsome-source-kentico-kontent` | Use this to log basic info about when the plugin starts and finishes its work |
+| `gridsome-source-kentico-kontent:source` | Use this to log information about the work that the plugin is doing |
+| `gridsome-source-kentico-kontent:delivery-client` | Use this to log information from the Kentico Kontent delivery client |
 
 Please read the debug docs for usage instructions.
 
@@ -1027,16 +1028,16 @@ The plugin exposes various configuration options that are split into the followi
 ```javascript
 plugins: [
   {
-    use: '@meeg/gridsome-source-kentico-cloud',
+    use: '@meeg/gridsome-source-kentico-kontent',
     options: {
       deliveryClientConfig: {
-        // Options for the Kentico Cloud delivery client
+        // Options for the Kentico Kontent delivery client
       },
       contentItemConfig: {
-        // Options used when loading Kentico Cloud content data
+        // Options used when loading Kentico Kontent content data
       },
       taxonomyConfig: {
-        // Options used when loading Kentico Cloud taxonomy data
+        // Options used when loading Kentico Kontent taxonomy data
       }
     }
   }
@@ -1047,13 +1048,13 @@ plugins: [
 
 ### `deliveryClientConfig` options
 
-These options are identical to the Kentico Cloud delivery client configuration options, with one exception:
+These options are identical to the Kentico Kontent delivery client configuration options, with one exception:
 
 | Key | Type | Default value | Notes |
 | --- | --- | --- | --- |
-| `contentItemsDepth` | `Number` | `3` | Sets the `depth` parameter on content queries, which can be used to [handle missing referenced linked items](https://github.com/Kentico/kentico-cloud-js/blob/delivery%405.7.2/packages/delivery/DOCS.md#handling-missing-referenced-linked-items) |
+| `contentItemsDepth` | `Number` | `3` | Sets the `depth` parameter on content queries, which can be used to [handle missing referenced linked items](https://github.com/Kentico/kentico-kontent-js/blob/delivery%406.2.0/packages/delivery/DOCS.md#handling-missing-referenced-linked-items) |
 
-Please see the [Kentico Cloud documentation](https://github.com/Kentico/kentico-cloud-js/blob/delivery%405.7.2/packages/delivery/DOCS.md#client-configuration) for a description of all other available options, which include options for setting preview mode, secure mode, and language.
+Please see the [Kentico Kontent documentation](https://github.com/Kentico/kentico-kontent-js/blob/delivery%406.2.0/packages/delivery/DOCS.md#client-configuration) for a description of all other available options, which include options for setting preview mode, secure mode, and language.
 
 ### `contentItemConfig` options
 

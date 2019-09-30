@@ -1,4 +1,4 @@
-const { ContentItem } = require('kentico-cloud-delivery');
+const { ContentItem } = require('@kentico/kontent-delivery');
 const changeCase = require('change-case');
 const { merge } = require('lodash');
 const slugify = require('@sindresorhus/slugify');
@@ -6,8 +6,8 @@ const slugify = require('@sindresorhus/slugify');
 class GridsomeContentItem extends ContentItem {
   constructor(typeName, route, richTextHtmlTransformer, data) {
     const defaultData = {
-      propertyResolver: (fieldName) => {
-        return this.resolveProperty(fieldName);
+      propertyResolver: (elementName) => {
+        return this.resolveProperty(elementName);
       }
     };
 
@@ -18,8 +18,8 @@ class GridsomeContentItem extends ContentItem {
     }
 
     if (richTextHtmlTransformer.canTransformLinks()) {
-      defaultData.linkResolver = (link, context) => {
-        // TODO: Ask Kentico Cloud why this seems to be being ignored
+      defaultData.urlSlugResolver = (link, context) => {
+        // TODO: This doesn't always appear to get called - raise issue with Kentico Kontent when have repro steps
         // Removing this results in warnings from the DeliveryClient when advanced logging is turned on
         return this.resolveLink(link, context);
       };
@@ -40,8 +40,8 @@ class GridsomeContentItem extends ContentItem {
     this.richTextHtmlTransformer = richTextHtmlTransformer;
   }
 
-  resolveProperty(fieldName) {
-    return this.getFieldName(fieldName);
+  resolveProperty(elementName) {
+    return this.getFieldName(elementName);
   }
 
   getFieldName(fieldName) {
@@ -62,7 +62,7 @@ class GridsomeContentItem extends ContentItem {
     const text = context.linkText;
 
     return {
-      asHtml: this.richTextHtmlTransformer.getLinkHtml(id, text)
+      html: this.richTextHtmlTransformer.getLinkHtml(id, text)
     }
   }
 
@@ -98,7 +98,7 @@ class GridsomeContentItem extends ContentItem {
         route: nodeRoute, // Components are not independent content and so will not have a route
         isComponent: isComponent,
         date: new Date(lastModified),
-        slug: defaultSlug // Will be overwritten if a `URL slug` type field is present on the content type
+        slug: defaultSlug // Will be overwritten if a `URL slug` type element is present on the content type
       },
       assetFields: [],
       linkedItemFields: [],
@@ -111,48 +111,24 @@ class GridsomeContentItem extends ContentItem {
   addFields(node) {
     // Add Content Elements as fields to the node
 
-    for (const codename in this.elements) {
-      const element = this.elements[codename];
+    for (const codename in this._raw.elements) {
+      const element = this._raw.elements[codename];
       const fieldName = this.getFieldName(codename);
       let field = this[fieldName];
 
-      if (element.type === 'modular_content') {
-        // "Linked items" fields are different to all others for some reason so we force it to be more uniform
-        // TODO : Ask Kentico Cloud to make it consistent
-
-        field = {
-          name: element.name,
-          type: element.type,
-          value: element.value,
-          linkedItems: field
-        };
-      }
-
       if (element.type === 'asset') {
-        // The AssetModel doesn't have width and height, but the element value does so we will map those values across
-        // TODO: Ask Kentico Cloud to add width and height
-
-        field.assets = field.assets.map(asset => {
-          const url = asset.url;
-
-          element.value
-            .filter(elementAsset => elementAsset.url === url)
-            .map(elementAsset => {
-              asset.width = elementAsset.width;
-              asset.height = elementAsset.height;
-            });
-
+        field.value = field.value.map(asset => {
           // We will use the asset url as the id as it is unique, and the id is not provided
-          // TODO: Ask Kentico Cloud if it can be provided
+          // TODO: Raise issue with Kentico Kontent to ask if asset ids can be provided
 
-          asset.id = url;
+          asset.id = asset.url;
 
           return asset;
         });
       }
 
       // Get a Field Resolver and use it to add the field and its value to the node
-      // TODO: Custom element fields
+      // TODO: Custom elements
 
       field.fieldName = fieldName;
 
@@ -227,7 +203,7 @@ class GridsomeContentItem extends ContentItem {
 
   modularContentTypeFieldResolver(node, field) {
     const fieldName = field.fieldName;
-    const linkedItems = field.linkedItems;
+    const linkedItems = field.value;
     const value = linkedItems.map(linkedItem => linkedItem.system.id);
 
     const linkedItemField = {
@@ -242,7 +218,7 @@ class GridsomeContentItem extends ContentItem {
 
   taxonomyTypeFieldResolver(node, field) {
     const fieldName = field.fieldName;
-    const value = field.taxonomyTerms.map(term => term.codename);
+    const value = field.value.map(term => term.codename);
     const taxonomyGroup = field.taxonomyGroup;
 
     const taxonomyField = {
@@ -257,7 +233,7 @@ class GridsomeContentItem extends ContentItem {
 
   assetTypeFieldResolver(node, field) {
     const fieldName = field.fieldName;
-    const assets = field.assets;
+    const assets = field.value;
     const value = assets.map(asset => asset.id);
 
     const assetField = {
