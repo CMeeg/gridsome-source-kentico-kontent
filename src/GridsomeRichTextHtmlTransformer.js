@@ -28,7 +28,7 @@ class GridsomeRichTextHtmlTransformer {
   }
 
   transformRichTextHtml(field) {
-    let html = field.getHtml();
+    let html = field.resolveHtml();
 
     if (!this.canTransformRichText()) {
       return html;
@@ -40,7 +40,7 @@ class GridsomeRichTextHtmlTransformer {
 
     const $ = cheerio.load(html, { decodeEntities: false });
 
-    // Kentico Cloud can return an empty paragraph element if there is no content, which is of no use
+    // Kentico Kontent can return an empty paragraph element if there is no content, which is of no use
     // If the rich text element has no text content, just return an empty string
 
     if ($(`.${wrapperCssClass}`).text().trim() === '') {
@@ -48,7 +48,8 @@ class GridsomeRichTextHtmlTransformer {
     }
 
     // Transform item links
-    // N.B. This shouldn't be necessary, but the `linkResolver` feature of the Kentico Cloud SDK doesn't appear to work
+    // N.B. This shouldn't be necessary, but the `urlSlugResolver` feature of the Kentico Kontent SDK doesn't appear to work all of the time
+    // TODO: If this does work consistently in future, this can be removed
 
     this.transformItemLinks($);
 
@@ -123,7 +124,7 @@ class GridsomeRichTextHtmlTransformer {
   }
 
   getLinkHtml(id, text) {
-    // Links to content items in rich text fields will be rendered as Vue components
+    // Links to content items in rich text elements will be rendered as Vue components
 
     const componentName = this.getComponentName(this.options.itemLinkComponentName);
 

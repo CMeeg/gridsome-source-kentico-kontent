@@ -1,32 +1,33 @@
 {
-  "name": "@meeg/gridsome-source-kentico-cloud",
-  "version": "0.1.1",
-  "description": "Kentico Cloud data source plugin for Gridsome.",
+  "name": "@meeg/gridsome-source-kentico-kontent",
+  "version": "0.2.0",
+  "description": "Kentico Kontent data source plugin for Gridsome.",
   "author": "Chris Meagher",
   "license": "MIT",
-  "homepage": "https://github.com/CMeeg/gridsome-source-kentico-cloud#readme",
-  "repository": "https://github.com/CMeeg/gridsome-source-kentico-cloud.git",
+  "homepage": "https://github.com/CMeeg/gridsome-source-kentico-kontent#readme",
+  "repository": "https://github.com/CMeeg/gridsome-source-kentico-kontent.git",
   "main": "src/index.js",
   "keywords": [
     "gridsome",
     "gridsome-plugin",
     "gridsome-source",
-    "kentico-cloud"
+    "kentico-kontent",
+    "kontent"
   ],
   "files": [
     "src/*.js"
   ],
   "dependencies": {
+    "@kentico/kontent-delivery": "^7.0.0",
     "@sindresorhus/slugify": "^0.9.1",
     "change-case": "^3.1.0",
     "cheerio": "^1.0.0-rc.3",
     "debug": "^4.1.1",
-    "kentico-cloud-delivery": "^5.7.2",
     "lodash": "^4.17.15",
     "rxjs": "^6.5.2"
   },
   "peerDependencies": {
-    "gridsome": "^0.6.7"
+    "gridsome": "~0.6.7"
   },
   "devDependencies": {
     "eslint": "^5.16.0",
@@ -35,6 +36,7 @@
     "eslint-plugin-node": "7.0.0",
     "eslint-plugin-promise": "4.0.0",
     "eslint-plugin-standard": "4.0.0",
+    "genversion": "^2.2.0",
     "standard-version": "^7.0.0"
   },
   "publishConfig": {
@@ -45,7 +47,7 @@
   },
   "scripts": {
     "lint": "eslint ./src",
-    "build": "yarn run lint",
+    "build": "genversion ./src/genversion.js -s && yarn run lint",
     "release": "standard-version"
   },
   "standard-version": {
