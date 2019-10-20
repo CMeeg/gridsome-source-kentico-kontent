@@ -114,7 +114,7 @@ class GridsomeContentItem extends ContentItem {
     for (const codename in this._raw.elements) {
       const element = this._raw.elements[codename];
       const fieldName = this.getFieldName(codename);
-      let field = this[fieldName];
+      const field = this[fieldName];
 
       if (element.type === 'asset') {
         field.value = field.value.map(asset => {
@@ -269,7 +269,7 @@ class GridsomeContentItem extends ContentItem {
     let fieldName = name;
     let fieldNameCount = 0;
 
-    while (node.item.hasOwnProperty(fieldName)) {
+    while (Object.prototype.hasOwnProperty.call(node.item, fieldName)) {
       fieldNameCount++;
 
       fieldName = `${name}${fieldNameCount}`;
