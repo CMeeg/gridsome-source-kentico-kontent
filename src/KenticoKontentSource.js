@@ -25,9 +25,9 @@ class KenticoKontentSource {
       await this.addContentNodes(store, contentType);
     }
 
-    // Add custom GraphQL schema fields
+    // Add custom GraphQL schema resolvers
 
-    this.addSchemaFields(store);
+    this.addSchemaResolvers(store);
   }
 
   addTypeResolvers(contentTypes) {
@@ -46,7 +46,7 @@ class KenticoKontentSource {
   }
 
   getCollection(store, typeName, route = null) {
-    const collection = store.getContentType(typeName);
+    const collection = store.getCollection(typeName);
 
     if (typeof (collection) !== 'undefined') {
       return collection;
@@ -58,7 +58,7 @@ class KenticoKontentSource {
 
     this.logger.log('Creating Gridsome content type %o', type);
 
-    return store.addContentType(type);
+    return store.addCollection(type);
   }
 
   async addTaxonomyGroupNodes(store) {
@@ -165,7 +165,7 @@ class KenticoKontentSource {
   }
 
   addContentNode(store, collection, node) {
-    const existingNode = collection.getNode(node.item.id);
+    const existingNode = collection.findNode({ id: node.item.id });
 
     if (existingNode !== null) {
       return existingNode;
@@ -247,7 +247,7 @@ class KenticoKontentSource {
 
         // Only add the asset node if it does not already exist in the collection
 
-        const existingNode = assetCollection.getNode(id);
+        const existingNode = assetCollection.findNode({ id });
 
         if (existingNode === null) {
           this.logger.log('Creating Gridsome node for asset %o', asset);
@@ -281,121 +281,126 @@ class KenticoKontentSource {
     collection.addNode(itemLinkNode);
   }
 
-  addSchemaFields(store) {
-    this.addAssetSchemaFields(store);
+  addSchemaResolvers(store) {
+    const { addSchemaResolvers } = store;
+
+    addSchemaResolvers(this.getAssetSchemaResolvers());
   }
 
-  addAssetSchemaFields(store) {
+  getAssetSchemaResolvers() {
     // TODO: This doesn't feel like the right place to do this
 
     const typeName = this.contentItemFactory.getAssetTypeName();
 
-    const collection = this.getCollection(store, typeName);
+    const resolvers = {};
 
-    collection.addSchemaField('url', ({ graphql }) => ({
-      type: graphql.GraphQLString,
-      args: {
-        width: {
-          type: graphql.GraphQLInt,
-          defaultValue: null
+    resolvers[typeName] = {
+      url: {
+        args: {
+          width: {
+            type: 'Int',
+            defaultValue: null
+          },
+          height: {
+            type: 'Int',
+            defaultValue: null
+          },
+          automaticFormat: {
+            type: 'Boolean',
+            defaultValue: null
+          },
+          format: {
+            type: 'String',
+            defaultValue: null
+          },
+          lossless: {
+            type: 'Boolean',
+            defaultValue: null
+          },
+          quality: {
+            type: 'Int',
+            defaultValue: null
+          },
+          dpr: {
+            type: 'Int',
+            defaultValue: null
+          }
         },
-        height: {
-          type: graphql.GraphQLInt,
-          defaultValue: null
-        },
-        automaticFormat: {
-          type: graphql.GraphQLBoolean,
-          defaultValue: null
-        },
-        format: {
-          type: graphql.GraphQLString,
-          defaultValue: null
-        },
-        lossless: {
-          type: graphql.GraphQLBoolean,
-          defaultValue: null
-        },
-        quality: {
-          type: graphql.GraphQLInt,
-          defaultValue: null
-        },
-        dpr: {
-          type: graphql.GraphQLInt,
-          defaultValue: null
-        }
-      },
-      resolve (node, args) {
-        const url = node.url;
-        const type = node.type;
+        resolve (obj, args) {
+          const url = obj.url;
+          const type = obj.type;
 
-        let urlBuilder = new ImageUrlBuilder(url);
+          let urlBuilder = new ImageUrlBuilder(url);
 
-        if (args.width !== null) {
-          urlBuilder = urlBuilder.withWidth(args.width);
-        }
+          if (args.width !== null) {
+            urlBuilder = urlBuilder.withWidth(args.width);
+          }
 
-        if (args.height !== null) {
-          urlBuilder = urlBuilder.withHeight(args.height);
-        }
+          if (args.height !== null) {
+            urlBuilder = urlBuilder.withHeight(args.height);
+          }
 
-        if (args.automaticFormat !== null) {
-          if (args.automaticFormat) {
-            switch (type.toLowerCase()) {
-              case 'image/gif':
-                urlBuilder = urlBuilder.withAutomaticFormat(ImageFormatEnum.Gif)
+          if (args.automaticFormat !== null) {
+            if (args.automaticFormat) {
+              switch (type.toLowerCase()) {
+                case 'image/gif':
+                  urlBuilder = urlBuilder.withAutomaticFormat(ImageFormatEnum.Gif)
+                  break;
+                case 'image/jpeg':
+                  urlBuilder = urlBuilder.withAutomaticFormat(ImageFormatEnum.Jpg)
+                  break;
+                case 'image/png':
+                  urlBuilder = urlBuilder.withAutomaticFormat(ImageFormatEnum.Png)
+                  break;
+              }
+            }
+          }
+
+          if (args.format !== null) {
+            switch (args.format.toLowerCase()) {
+              case 'gif':
+                urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Gif)
                 break;
-              case 'image/jpeg':
-                urlBuilder = urlBuilder.withAutomaticFormat(ImageFormatEnum.Jpg)
+              case 'jpg':
+              case 'jpeg':
+                urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Jpg)
                 break;
-              case 'image/png':
-                urlBuilder = urlBuilder.withAutomaticFormat(ImageFormatEnum.Png)
+              case 'pjpg':
+              case 'pjpeg':
+                urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Pjpg)
+                break;
+              case 'png':
+                urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Png)
+                break;
+              case 'png8':
+                urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Png8)
+                break;
+              case 'webp':
+                urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Webp)
                 break;
             }
           }
-        }
 
-        if (args.format !== null) {
-          switch (args.format.toLowerCase()) {
-            case 'gif':
-              urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Gif)
-              break;
-            case 'jpg':
-            case 'jpeg':
-              urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Jpg)
-              break;
-            case 'pjpg':
-            case 'pjpeg':
-              urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Pjpg)
-              break;
-            case 'png':
-              urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Png)
-              break;
-            case 'png8':
-              urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Png8)
-              break;
-            case 'webp':
-              urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Webp)
-              break;
+          if (args.lossless !== null) {
+            const compression = args.lossless ? ImageCompressionEnum.Lossless : ImageCompressionEnum.Lossy;
+
+            urlBuilder = urlBuilder.withCompression(compression);
           }
+
+          if (args.quality !== null) {
+            urlBuilder = urlBuilder.withQuality(args.quality);
+          }
+
+          if (args.dpr !== null) {
+            urlBuilder = urlBuilder.withDpr(args.dpr);
+          }
+
+          return urlBuilder.getUrl();
         }
-
-        if (args.lossless !== null) {
-          const compression = args.lossless ? ImageCompressionEnum.Lossless : ImageCompressionEnum.Lossy;
-
-          urlBuilder = urlBuilder.withCompression(compression);
-        }
-
-        if (args.quality !== null) {
-          urlBuilder = urlBuilder.withQuality(args.quality);
-        }
-
-        if (args.dpr !== null) {
-          urlBuilder = urlBuilder.withDpr(args.dpr);
-        }
-
-        return urlBuilder.getUrl();
       }
-    }));
+    };
+
+    return resolvers;
   }
 }
 
