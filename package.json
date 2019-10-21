@@ -18,24 +18,24 @@
     "src/*.js"
   ],
   "dependencies": {
-    "@kentico/kontent-delivery": "^7.0.0",
+    "@kentico/kontent-delivery": "^7.1.0",
     "@sindresorhus/slugify": "^0.9.1",
     "change-case": "^3.1.0",
     "cheerio": "^1.0.0-rc.3",
     "debug": "^4.1.1",
     "lodash": "^4.17.15",
-    "rxjs": "^6.5.2"
+    "rxjs": "^6.5.3"
   },
   "peerDependencies": {
-    "gridsome": "~0.6.7"
+    "gridsome": "~0.7.8"
   },
   "devDependencies": {
-    "eslint": "^5.16.0",
-    "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-import": "2.13.0",
-    "eslint-plugin-node": "7.0.0",
-    "eslint-plugin-promise": "4.0.0",
-    "eslint-plugin-standard": "4.0.0",
+    "eslint": "^6.5.1",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "2.18.2",
+    "eslint-plugin-node": "10.0.0",
+    "eslint-plugin-promise": "4.2.1",
+    "eslint-plugin-standard": "4.0.1",
     "genversion": "^2.2.0",
     "standard-version": "^7.0.0"
   },
