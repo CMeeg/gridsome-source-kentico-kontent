@@ -1,7 +1,6 @@
 const changeCase = require('change-case');
 const GridsomeContentItem = require('./GridsomeContentItem');
 const GridsomeRichTextHtmlTransformer = require('./GridsomeRichTextHtmlTransformer');
-const slugify = require('@sindresorhus/slugify');
 
 class GridsomeContentItemFactory {
   constructor(options) {
@@ -15,16 +14,6 @@ class GridsomeContentItemFactory {
     const typeName = `${typeNamePrefix}${changeCase.pascalCase(codename)}`;
 
     return typeName;
-  }
-
-  getRoute(codename) {
-    const route = this.options.routes[codename];
-
-    if (typeof(route) === 'undefined') {
-      return `/${slugify(codename)}/:slug`;
-    }
-
-    return route;
   }
 
   getContentItem(codename) {
@@ -44,12 +33,11 @@ class GridsomeContentItemFactory {
   createContentItem(contentType) {
     const codename = contentType.system.codename;
     const typeName = this.getTypeName(codename);
-    const route = this.getRoute(codename);
     const ContentItem = this.getContentItem(codename);
     const richTextHtmlTransformer = this.getRichTextHtmlTransformer();
     const data = {};
 
-    return new ContentItem(typeName, route, richTextHtmlTransformer, data);
+    return new ContentItem(typeName, richTextHtmlTransformer, data);
   }
 
   getAssetTypeName() {

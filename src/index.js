@@ -17,7 +17,6 @@ class KenticoKontentSourcePlugin {
         assetTypeName: 'Asset',
         itemLinkTypeName: 'ItemLink',
         contentItems: {},
-        routes: {},
         richText: {
           wrapperCssClass: 'rich-text',
           componentNamePrefix: '',
@@ -29,8 +28,7 @@ class KenticoKontentSourcePlugin {
         }
       },
       taxonomyConfig: {
-        taxonomyTypeNamePrefix: 'Taxonomy',
-        routes: {}
+        taxonomyTypeNamePrefix: 'Taxonomy'
       }
     }
   };
