@@ -1,7 +1,5 @@
 # @meeg/gridsome-source-kentico-kontent
 
-> This plugin currently does not support Gridsome >= 0.7.0. Support will be coming as soon as possible.
-
 A [Kentico Kontent](https://kontent.ai/) data source plugin for [Gridsome](https://gridsome.org/) that aims to support all of the main features of Kentico Kontent:
 
 ✔ Content (including all content element types)\
