@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 0.3.0 (2019-10-21)
+
+### ⚠ BREAKING CHANGES
+
+* **gridsome:** Gridsome 0.7 changes the way routing is handled. Routing is no longer taken care of by this plugin and you will need to update your app to use the new [templates config](https://gridsome.org/blog/2019/09/17/gridsome-v07/#new-template-configuration) instead. Other changes to Gridsome may effect your app also, so please read through the 0.7 announcement blog post and this project's readme and adjust accordingly.
+
+### Features
+
+* **gridsome:** Update to use latest version of Gridsome ([a73002b](https://github.com/CMeeg/gridsome-source-kentico-kontent/commit/a73002b)), closes [#6](https://github.com/CMeeg/gridsome-source-kentico-kontent/issues/6)
+
 ## 0.2.0 (2019-09-30)
 
 ### ⚠ BREAKING CHANGES
