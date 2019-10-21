@@ -986,7 +986,11 @@ The plugin defines the following namespaces:
 | `gridsome-source-kentico-kontent:source` | Use this to log information about the work that the plugin is doing |
 | `gridsome-source-kentico-kontent:delivery-client` | Use this to log information from the Kentico Kontent delivery client |
 
-Please read the debug docs for usage instructions.
+To have the log output to your console you will need to set a `DEBUG` environment variable to include one or more of the above namespaces, for example (the actual command to set the environment variable may differ depending on the OS or shell in use):
+
+`DEBUG=gridsome-source-kentico-cloud,gridsome-source-kentico-cloud:*`
+
+Please read the debug docs for full [usage](https://github.com/visionmedia/debug#usage) instructions.
 
 ## Configuration
 
