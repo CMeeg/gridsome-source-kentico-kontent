@@ -1,9 +1,8 @@
 const slugify = require('@sindresorhus/slugify');
 
 class GridsomeTaxonomyItem {
-  constructor(typeName, route, terms) {
+  constructor(typeName, terms) {
     this.typeName = typeName;
-    this.route = route;
     this.terms = [];
 
     this.addTerms(this, terms);
@@ -31,10 +30,6 @@ class GridsomeTaxonomyItem {
   }
 
   getSlug(node, term) {
-    if (this.route === null) {
-      return null;
-    }
-
     let slug = slugify(term.codename);
 
     if (node.slug) {

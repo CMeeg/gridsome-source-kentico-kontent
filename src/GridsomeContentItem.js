@@ -4,7 +4,7 @@ const { merge } = require('lodash');
 const slugify = require('@sindresorhus/slugify');
 
 class GridsomeContentItem extends ContentItem {
-  constructor(typeName, route, richTextHtmlTransformer, data) {
+  constructor(typeName, richTextHtmlTransformer, data) {
     const defaultData = {
       propertyResolver: (elementName) => {
         return this.resolveProperty(elementName);
@@ -36,7 +36,6 @@ class GridsomeContentItem extends ContentItem {
     super(mergedData);
 
     this.typeName = typeName;
-    this.route = route;
     this.richTextHtmlTransformer = richTextHtmlTransformer;
   }
 
@@ -82,8 +81,7 @@ class GridsomeContentItem extends ContentItem {
     // If the content item's id and name are the same, this is a Rich Text Component
 
     const isComponent = id === name;
-    const nodeRoute = isComponent ? null : this.route;
-    const defaultSlug = nodeRoute ? slugify(name) : null;
+    const defaultSlug = isComponent ? null : slugify(name);
 
     // Initialise a content node with fields from system data, which should be consistent across all nodes in Gridsome
 
@@ -95,7 +93,6 @@ class GridsomeContentItem extends ContentItem {
         languageCode,
         type,
         typeName: this.typeName,
-        route: nodeRoute, // Components are not independent content and so will not have a route
         isComponent: isComponent,
         date: new Date(lastModified),
         slug: defaultSlug // Will be overwritten if a `URL slug` type element is present on the content type
@@ -114,7 +111,7 @@ class GridsomeContentItem extends ContentItem {
     for (const codename in this._raw.elements) {
       const element = this._raw.elements[codename];
       const fieldName = this.getFieldName(codename);
-      let field = this[fieldName];
+      const field = this[fieldName];
 
       if (element.type === 'asset') {
         field.value = field.value.map(asset => {
@@ -269,7 +266,7 @@ class GridsomeContentItem extends ContentItem {
     let fieldName = name;
     let fieldNameCount = 0;
 
-    while (node.item.hasOwnProperty(fieldName)) {
+    while (Object.prototype.hasOwnProperty.call(node.item, fieldName)) {
       fieldNameCount++;
 
       fieldName = `${name}${fieldNameCount}`;
