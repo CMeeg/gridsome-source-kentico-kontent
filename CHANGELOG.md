@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 0.4.0 (2019-11-17)
+
+### ⚠ BREAKING CHANGES
+
+* This is only a breaking change if you have derived from `GridsomeContentItem` and overridden the `addFields` function.
+    * `addFields` is now async so that other async functions, tools, libs can be used when creating content items.
+
+### Features
+
+* Content item node creation is now an async operation ([c606fb5](https://github.com/CMeeg/gridsome-source-kentico-kontent/commit/c606fb5))
+
 ## 0.3.0 (2019-10-21)
 
 ### ⚠ BREAKING CHANGES
