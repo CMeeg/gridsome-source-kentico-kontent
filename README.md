@@ -742,12 +742,12 @@ const { GridsomeContentItem } = require('@meeg/gridsome-source-kentico-kontent')
 
 class PostContentItem extends GridsomeContentItem {
   // Override the `addFields` function - this is called after all "system" fields are set
-  addFields(node) {
+  async addFields(node) {
     /*
     Call the `addFields` function of the base class - we want the default behaviour to run
     first, and then we will manipulate the data to enforce our custom behaviour
     */
-    super.addFields(node);
+    await super.addFields(node);
 
     this.ensureDateField(node);
 
@@ -899,19 +899,22 @@ The goal is to:
 const { GridsomeContentItem } = require('@meeg/gridsome-source-kentico-kontent');
 
 class PostSeriesContentItem extends GridsomeContentItem {
-  addFields(node) {
-    super.addFields(node);
+  async addFields(node) {
+    await super.addFields(node);
 
-    this.setLastUpdatedField(node);
+    await this.setLastUpdatedField(node);
 
     return node;
   }
 
-  setLastUpdatedField(node) {
+  async setLastUpdatedField(node) {
     // Find the `postsInSeries` field and then run it through a map function to return the most recent post date
-    const postLastUpdated = node.linkedItemFields
-      .filter(field => field.fieldName === 'postsInSeries')
-      .map(field => this.getPostLastUpdated(field.linkedItems));
+    const postsInSeriesFields = node.linkedItemFields
+      .filter(field => field.fieldName === 'postsInSeries');
+
+    const postLastUpdated = await Promise.all(
+      postsInSeriesFields.map(async field => this.getPostLastUpdated(field.linkedItems))
+    );
 
     // Add the most recent post date as a new field called `lastUpdated`
     const value = postLastUpdated[0];
@@ -920,19 +923,21 @@ class PostSeriesContentItem extends GridsomeContentItem {
     this.addField(node, 'lastUpdated', value);
   }
 
-  getPostLastUpdated(posts) {
-    const postDates = posts
-      .map(post => {
-        const node = post.createNode();
+  async getPostLastUpdated(posts) {
+    const postDates = await Promise.all(
+      posts.map(async post => {
+        const node = await post.createNode();
         const date = node.item.date;
 
         return date;
       })
-      .reduce((prevDate, currentDate) => {
-        return prevDate > currentDate ? prevDate : currentDate
-      });
+    );
 
-    return postDates;
+    const sortedPostDates = postDates.reduce((prevDate, currentDate) => {
+      return prevDate > currentDate ? prevDate : currentDate
+    });
+
+    return sortedPostDates;
   }
 }
 

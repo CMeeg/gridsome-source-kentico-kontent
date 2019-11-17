@@ -65,10 +65,10 @@ class GridsomeContentItem extends ContentItem {
     }
   }
 
-  createNode() {
+  async createNode() {
     const node = this.initNode();
 
-    this.addFields(node);
+    await this.addFields(node);
 
     return node;
   }
@@ -105,7 +105,7 @@ class GridsomeContentItem extends ContentItem {
     return node;
   }
 
-  addFields(node) {
+  async addFields(node) {
     // Add Content Elements as fields to the node
 
     for (const codename in this._raw.elements) {

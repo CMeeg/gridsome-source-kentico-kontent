@@ -128,21 +128,21 @@ class KenticoKontentSource {
 
       this.logger.log('Adding linked items for content of type %s', codename);
 
-      this.addContentItemNodes(store, linkedItems);
+      await this.addContentItemNodes(store, linkedItems);
     }
 
     // Now add the content items
 
     this.logger.log('Adding content items for content of type %s', codename);
 
-    this.addContentItemNodes(store, contentItems);
+    await this.addContentItemNodes(store, contentItems);
   }
 
-  addContentItemNodes(store, contentItems) {
+  async addContentItemNodes(store, contentItems) {
     for (const contentItem of contentItems) {
       // Create the content item node
 
-      const node = contentItem.createNode();
+      const node = await contentItem.createNode();
 
       this.logger.log('Creating Gridsome node for content %O', node);
 
