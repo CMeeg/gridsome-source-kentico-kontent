@@ -55,14 +55,16 @@ plugins: [
 
 ### Configure Gridsome to resolve Rich Text fields using Vue single file components
 
-Configure Gridsome to use the "[Runtime + Compiler](https://vuejs.org/v2/guide/installation.html#Runtime-Compiler-vs-Runtime-only)" build of Vue because we will need the compiler to enable us to treat the Rich Text field content as a Vue component template.
+First, [configure Gridsome](https://gridsome.org/docs/config/#runtimecompiler) to use the "[Runtime + Compiler](https://vuejs.org/v2/guide/installation.html#Runtime-Compiler-vs-Runtime-only)" build of Vue because we will need the compiler to enable us to treat the Rich Text field content as a Vue component template.
 
-In your `gridsome.server.js` file:
+In your `gridsome.config.js` file:
 
 ```javascript
-api.configureWebpack(config => {
-    config.resolve.alias['vue'] = 'vue/dist/vue.common';
-})
+module.exports = {
+  ...
+  runtimeCompiler: true
+  ...
+}
 ```
 
 Add a Vue single file component that will be used to render Rich Text fields. This component is a wrapper around [`v-runtime-template`](https://github.com/alexjoverm/v-runtime-template) and will be extended to resolve other components embedded inside your Rich Text fields e.g. content components/items, content links and assets.
@@ -742,12 +744,12 @@ const { GridsomeContentItem } = require('@meeg/gridsome-source-kentico-kontent')
 
 class PostContentItem extends GridsomeContentItem {
   // Override the `addFields` function - this is called after all "system" fields are set
-  addFields(node) {
+  async addFields(node) {
     /*
     Call the `addFields` function of the base class - we want the default behaviour to run
     first, and then we will manipulate the data to enforce our custom behaviour
     */
-    super.addFields(node);
+    await super.addFields(node);
 
     this.ensureDateField(node);
 
@@ -899,19 +901,22 @@ The goal is to:
 const { GridsomeContentItem } = require('@meeg/gridsome-source-kentico-kontent');
 
 class PostSeriesContentItem extends GridsomeContentItem {
-  addFields(node) {
-    super.addFields(node);
+  async addFields(node) {
+    await super.addFields(node);
 
-    this.setLastUpdatedField(node);
+    await this.setLastUpdatedField(node);
 
     return node;
   }
 
-  setLastUpdatedField(node) {
+  async setLastUpdatedField(node) {
     // Find the `postsInSeries` field and then run it through a map function to return the most recent post date
-    const postLastUpdated = node.linkedItemFields
-      .filter(field => field.fieldName === 'postsInSeries')
-      .map(field => this.getPostLastUpdated(field.linkedItems));
+    const postsInSeriesFields = node.linkedItemFields
+      .filter(field => field.fieldName === 'postsInSeries');
+
+    const postLastUpdated = await Promise.all(
+      postsInSeriesFields.map(async field => this.getPostLastUpdated(field.linkedItems))
+    );
 
     // Add the most recent post date as a new field called `lastUpdated`
     const value = postLastUpdated[0];
@@ -920,19 +925,21 @@ class PostSeriesContentItem extends GridsomeContentItem {
     this.addField(node, 'lastUpdated', value);
   }
 
-  getPostLastUpdated(posts) {
-    const postDates = posts
-      .map(post => {
-        const node = post.createNode();
+  async getPostLastUpdated(posts) {
+    const postDates = await Promise.all(
+      posts.map(async post => {
+        const node = await post.createNode();
         const date = node.item.date;
 
         return date;
       })
-      .reduce((prevDate, currentDate) => {
-        return prevDate > currentDate ? prevDate : currentDate
-      });
+    );
 
-    return postDates;
+    const sortedPostDates = postDates.reduce((prevDate, currentDate) => {
+      return prevDate > currentDate ? prevDate : currentDate
+    });
+
+    return sortedPostDates;
   }
 }
 
