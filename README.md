@@ -55,14 +55,16 @@ plugins: [
 
 ### Configure Gridsome to resolve Rich Text fields using Vue single file components
 
-Configure Gridsome to use the "[Runtime + Compiler](https://vuejs.org/v2/guide/installation.html#Runtime-Compiler-vs-Runtime-only)" build of Vue because we will need the compiler to enable us to treat the Rich Text field content as a Vue component template.
+First, [configure Gridsome](https://gridsome.org/docs/config/#runtimecompiler) to use the "[Runtime + Compiler](https://vuejs.org/v2/guide/installation.html#Runtime-Compiler-vs-Runtime-only)" build of Vue because we will need the compiler to enable us to treat the Rich Text field content as a Vue component template.
 
-In your `gridsome.server.js` file:
+In your `gridsome.config.js` file:
 
 ```javascript
-api.configureWebpack(config => {
-    config.resolve.alias['vue'] = 'vue/dist/vue.common';
-})
+module.exports = {
+  ...
+  runtimeCompiler: true
+  ...
+}
 ```
 
 Add a Vue single file component that will be used to render Rich Text fields. This component is a wrapper around [`v-runtime-template`](https://github.com/alexjoverm/v-runtime-template) and will be extended to resolve other components embedded inside your Rich Text fields e.g. content components/items, content links and assets.
