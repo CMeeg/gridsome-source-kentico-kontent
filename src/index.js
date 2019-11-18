@@ -3,6 +3,7 @@ const KenticoKontentSource = require('./KenticoKontentSource');
 const GridsomeContentItemFactory = require('./GridsomeContentItemFactory');
 const GridsomeContentItem = require('./GridsomeContentItem');
 const GridsomeTaxonomyItemFactory = require('./GridsomeTaxonomyItemFactory');
+const GridsomeAssetItemFactory = require('./GridsomeAssetItemFactory');
 const Logger = require('./Logger');
 
 class KenticoKontentSourcePlugin {
@@ -14,7 +15,6 @@ class KenticoKontentSourcePlugin {
       },
       contentItemConfig: {
         contentItemTypeNamePrefix: '',
-        assetTypeName: 'Asset',
         itemLinkTypeName: 'ItemLink',
         contentItems: {},
         richText: {
@@ -29,6 +29,9 @@ class KenticoKontentSourcePlugin {
       },
       taxonomyConfig: {
         taxonomyTypeNamePrefix: 'Taxonomy'
+      },
+      assetConfig: {
+        assetTypeName: 'Asset'
       }
     }
   };
@@ -40,11 +43,13 @@ class KenticoKontentSourcePlugin {
       const deliveryClient = new DeliveryClient(options.deliveryClientConfig, logger);
       const contentItemFactory = new GridsomeContentItemFactory(options.contentItemConfig);
       const taxonomyItemFactory = new GridsomeTaxonomyItemFactory(options.taxonomyConfig);
+      const assetItemFactory = new GridsomeAssetItemFactory(options.assetConfig);
 
       const kenticoKontentSource = new KenticoKontentSource(
         deliveryClient,
         contentItemFactory,
         taxonomyItemFactory,
+        assetItemFactory,
         logger
       );
 

@@ -1,10 +1,9 @@
-const { ImageUrlBuilder, ImageCompressionEnum, ImageFormatEnum } = require('@kentico/kontent-delivery');
-
 class KenticoKontentSource {
-  constructor(deliveryClient, contentItemFactory, taxonomyItemFactory, logger) {
+  constructor(deliveryClient, contentItemFactory, taxonomyItemFactory, assetItemFactory, logger) {
     this.deliveryClient = deliveryClient;
     this.contentItemFactory = contentItemFactory;
     this.taxonomyItemFactory = taxonomyItemFactory;
+    this.assetItemFactory = assetItemFactory;
     this.logger = logger.extend('source');
   }
 
@@ -24,10 +23,6 @@ class KenticoKontentSource {
     for (const contentType of contentTypes.types) {
       await this.addContentNodes(store, contentType);
     }
-
-    // Add custom GraphQL schema resolvers
-
-    this.addSchemaResolvers(store);
   }
 
   addTypeResolvers(contentTypes) {
@@ -45,7 +40,7 @@ class KenticoKontentSource {
     }
   }
 
-  getCollection(store, typeName) {
+  getCollection(store, typeName, schemaCreator) {
     const collection = store.getCollection(typeName);
 
     if (typeof (collection) !== 'undefined') {
@@ -54,7 +49,25 @@ class KenticoKontentSource {
 
     this.logger.log('Creating Gridsome content type %s', typeName);
 
+    this.addItemSchema(store, schemaCreator);
+
     return store.addCollection(typeName);
+  }
+
+  addItemSchema(store, schemaCreator) {
+    const { addSchemaTypes, addSchemaResolvers, schema } = store;
+
+    const itemSchema = schemaCreator();
+
+    if (itemSchema.types) {
+      const schemaTypes = itemSchema.types.map(type => schema.createObjectType(type));
+
+      addSchemaTypes(schemaTypes);
+    }
+
+    if (itemSchema.resolvers) {
+      addSchemaResolvers(itemSchema.resolvers);
+    }
   }
 
   async addTaxonomyGroupNodes(store) {
@@ -68,7 +81,8 @@ class KenticoKontentSource {
       const taxonomyItem = this.taxonomyItemFactory.createTaxonomyItem(taxonomyGroup);
       const typeName = taxonomyItem.typeName;
 
-      const collection = this.getCollection(store, typeName);
+      // TODO: Create schema
+      const collection = this.getCollection(store, typeName, () => ({}));
 
       // Add taxonomy terms from this group to the collection
       // The reference is added because terms can be nested so the term nodes hold references to other terms
@@ -150,7 +164,8 @@ class KenticoKontentSource {
 
       const typeName = node.item.typeName;
 
-      const collection = this.getCollection(store, typeName);
+      // TODO: Create schema
+      const collection = this.getCollection(store, typeName, () => ({}));
 
       // Add the node to the collection
 
@@ -224,11 +239,11 @@ class KenticoKontentSource {
   }
 
   addAssetFields(store, collection, node) {
-    // Get or create the Asset collection
+    // Prepare the Asset collection
 
-    const typeName = this.contentItemFactory.getAssetTypeName();
+    const typeName = this.assetItemFactory.getTypeName();
 
-    const assetCollection = this.getCollection(store, typeName);
+    let assetCollection = null;
 
     // Add a reference to the Asset collection for all asset fields defined on the node
 
@@ -237,16 +252,22 @@ class KenticoKontentSource {
       const assets = assetField.assets;
 
       for (const asset of assets) {
-        const id = asset.id;
+        const assetItem = this.assetItemFactory.createAssetItem(asset);
+
+        if (assetCollection === null) {
+          assetCollection = this.getCollection(store, typeName, () => assetItem.createSchema());
+        }
+
+        const assetNode = assetItem.createNode();
 
         // Only add the asset node if it does not already exist in the collection
 
-        const existingNode = assetCollection.findNode({ id });
+        const existingNode = assetCollection.findNode({ id: assetNode.id });
 
         if (existingNode === null) {
           this.logger.log('Creating Gridsome node for asset %o', asset);
 
-          assetCollection.addNode(asset);
+          assetCollection.addNode(assetNode);
         }
       }
 
@@ -259,7 +280,8 @@ class KenticoKontentSource {
 
     const typeName = this.contentItemFactory.getItemLinkTypeName();
 
-    const collection = this.getCollection(store, typeName);
+    // TODO: Create schema
+    const collection = this.getCollection(store, typeName, () => ({}));
 
     // Add the Item Link node to the collection
 
@@ -272,128 +294,6 @@ class KenticoKontentSource {
     this.logger.log('Creating Gridsome node for item link %o', itemLinkNode);
 
     collection.addNode(itemLinkNode);
-  }
-
-  addSchemaResolvers(store) {
-    const { addSchemaResolvers } = store;
-
-    addSchemaResolvers(this.getAssetSchemaResolvers());
-  }
-
-  getAssetSchemaResolvers() {
-    // TODO: This doesn't feel like the right place to do this
-
-    const typeName = this.contentItemFactory.getAssetTypeName();
-
-    const resolvers = {};
-
-    resolvers[typeName] = {
-      url: {
-        args: {
-          width: {
-            type: 'Int',
-            defaultValue: null
-          },
-          height: {
-            type: 'Int',
-            defaultValue: null
-          },
-          automaticFormat: {
-            type: 'Boolean',
-            defaultValue: null
-          },
-          format: {
-            type: 'String',
-            defaultValue: null
-          },
-          lossless: {
-            type: 'Boolean',
-            defaultValue: null
-          },
-          quality: {
-            type: 'Int',
-            defaultValue: null
-          },
-          dpr: {
-            type: 'Int',
-            defaultValue: null
-          }
-        },
-        resolve (obj, args) {
-          const url = obj.url;
-          const type = obj.type;
-
-          let urlBuilder = new ImageUrlBuilder(url);
-
-          if (args.width !== null) {
-            urlBuilder = urlBuilder.withWidth(args.width);
-          }
-
-          if (args.height !== null) {
-            urlBuilder = urlBuilder.withHeight(args.height);
-          }
-
-          if (args.automaticFormat !== null) {
-            if (args.automaticFormat) {
-              switch (type.toLowerCase()) {
-                case 'image/gif':
-                  urlBuilder = urlBuilder.withAutomaticFormat(ImageFormatEnum.Gif)
-                  break;
-                case 'image/jpeg':
-                  urlBuilder = urlBuilder.withAutomaticFormat(ImageFormatEnum.Jpg)
-                  break;
-                case 'image/png':
-                  urlBuilder = urlBuilder.withAutomaticFormat(ImageFormatEnum.Png)
-                  break;
-              }
-            }
-          }
-
-          if (args.format !== null) {
-            switch (args.format.toLowerCase()) {
-              case 'gif':
-                urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Gif)
-                break;
-              case 'jpg':
-              case 'jpeg':
-                urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Jpg)
-                break;
-              case 'pjpg':
-              case 'pjpeg':
-                urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Pjpg)
-                break;
-              case 'png':
-                urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Png)
-                break;
-              case 'png8':
-                urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Png8)
-                break;
-              case 'webp':
-                urlBuilder = urlBuilder.withFormat(ImageFormatEnum.Webp)
-                break;
-            }
-          }
-
-          if (args.lossless !== null) {
-            const compression = args.lossless ? ImageCompressionEnum.Lossless : ImageCompressionEnum.Lossy;
-
-            urlBuilder = urlBuilder.withCompression(compression);
-          }
-
-          if (args.quality !== null) {
-            urlBuilder = urlBuilder.withQuality(args.quality);
-          }
-
-          if (args.dpr !== null) {
-            urlBuilder = urlBuilder.withDpr(args.dpr);
-          }
-
-          return urlBuilder.getUrl();
-        }
-      }
-    };
-
-    return resolvers;
   }
 }
 

@@ -40,10 +40,6 @@ class GridsomeContentItemFactory {
     return new ContentItem(typeName, richTextHtmlTransformer, data);
   }
 
-  getAssetTypeName() {
-    return this.options.assetTypeName;
-  }
-
   getItemLinkTypeName() {
     return this.options.itemLinkTypeName;
   }
