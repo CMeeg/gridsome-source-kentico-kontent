@@ -319,6 +319,10 @@ class KenticoKontentSource {
           dpr: {
             type: 'Int',
             defaultValue: null
+          },
+          description: {
+            type: 'String',
+            defaultValue: null
           }
         },
         resolve (obj, args) {
