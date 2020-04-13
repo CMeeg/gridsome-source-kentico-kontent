@@ -289,6 +289,8 @@ class KenticoKontentSource {
 
     resolvers[typeName] = {
       url: {
+        type: 'String',
+        defaultValue: null,
         args: {
           width: {
             type: 'Int',
