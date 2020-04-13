@@ -275,15 +275,30 @@ class KenticoKontentSource {
   }
 
   addSchemaResolvers(store) {
-    const { addSchemaResolvers } = store;
-
-    addSchemaResolvers(this.getAssetSchemaResolvers());
+    this.addAssetSchemaResolvers(store);
   }
 
-  getAssetSchemaResolvers() {
-    // TODO: This doesn't feel like the right place to do this
-
+  addAssetSchemaResolvers(store) {
     const typeName = this.contentItemFactory.getAssetTypeName();
+
+    const assetCollection = this.getCollection(store, typeName);
+
+    if (assetCollection.collection.data.length === 0) {
+      // There are no assets so no need for resolvers
+
+      return;
+    }
+
+    // Get and add asset resolvers
+
+    const { addSchemaResolvers } = store;
+    const assetResolvers = this.getAssetSchemaResolvers(typeName);
+
+    addSchemaResolvers(assetResolvers);
+  }
+
+  getAssetSchemaResolvers(typeName) {
+    // TODO: This doesn't feel like the right place to do this
 
     const resolvers = {};
 
