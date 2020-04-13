@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 0.4.1 (2020-04-13)
+
+### Bug Fixes
+
+* Changes to fix issues with Asset-related errors raised on [#11](https://github.com/CMeeg/gridsome-source-kentico-kontent/issues/11) and [#12](https://github.com/CMeeg/gridsome-source-kentico-kontent/issues/12)
+  * Do not add url field resolver if Assets collection is empty ([9900350](https://github.com/CMeeg/gridsome-source-kentico-kontent/commit/9900350))
+  * Resolver for Asset.url must have a "type" property ([4e322c9](https://github.com/CMeeg/gridsome-source-kentico-kontent/commit/4e322c9))
+
 ## 0.4.0 (2019-11-17)
 
 ### ⚠ BREAKING CHANGES
