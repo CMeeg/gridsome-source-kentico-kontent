@@ -248,9 +248,8 @@ class KenticoKontentSource {
 
           assetCollection.addNode(asset);
         } else if (existingNode.name === null) {
+          // In case the asset was previously created as rich text asset
 
-          // in case the asset was previously created as rich text asset
-          
           this.logger.log('Updating Gridsome node for asset %o', asset);
 
           existingNode.name = asset.name;
@@ -272,7 +271,7 @@ class KenticoKontentSource {
       for (const asset of assets) {
         const id = asset.url;
 
-        const existingNode = assetCollection.findNode({id});
+        const existingNode = assetCollection.findNode({ id });
         if (existingNode === null) {
           const transformedAsset = {
             contract: {
@@ -282,7 +281,7 @@ class KenticoKontentSource {
               size: null,
               url: asset.url,
               width: asset.width,
-              height: asset.height,
+              height: asset.height
             },
             name: null,
             type: null,

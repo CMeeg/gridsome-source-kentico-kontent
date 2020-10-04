@@ -200,7 +200,7 @@ class GridsomeContentItem extends ContentItem {
       fieldName,
       assets: field.images
     };
-    
+
     node.richTextFields.push(richTextField);
 
     this.addField(node, fieldName, html);
