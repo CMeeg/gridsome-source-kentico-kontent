@@ -1,6 +1,6 @@
 {
   "name": "@meeg/gridsome-source-kentico-kontent",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Kentico Kontent data source plugin for Gridsome.",
   "author": "Chris Meagher",
   "license": "MIT",

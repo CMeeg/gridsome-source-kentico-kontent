@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 0.5.0 (2020-10-04)
+
+### Bug Fixes
+
+* Adds rich text assets to assets collection ([963487e](https://github.com/CMeeg/gridsome-source-kentico-kontent/commit/963487e0347aa2f919e7c3ffc7df0084ec6ad753)), closes [#15](https://github.com/CMeeg/gridsome-source-kentico-kontent/issues/15)
+
 ## 0.4.1 (2020-04-13)
 
 ### Bug Fixes
