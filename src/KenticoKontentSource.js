@@ -247,10 +247,58 @@ class KenticoKontentSource {
           this.logger.log('Creating Gridsome node for asset %o', asset);
 
           assetCollection.addNode(asset);
+        } else if (existingNode.name === null) {
+
+          // in case the asset was previously created as rich text asset
+          
+          this.logger.log('Updating Gridsome node for asset %o', asset);
+
+          existingNode.name = asset.name;
+          existingNode.contract.name = asset.contract.name;
+          existingNode.type = asset.type;
+          existingNode.contract.type = asset.contract.type;
+          existingNode.size = asset.size;
+          existingNode.contract.size = asset.contract.size;
         }
       }
 
       collection.addReference(fieldName, typeName);
+    }
+
+    // Add assets from rich text fields
+    for (const assetField of node.richTextFields) {
+      const assets = assetField.assets;
+
+      for (const asset of assets) {
+        const id = asset.url;
+
+        const existingNode = assetCollection.findNode({id});
+        if (existingNode === null) {
+          const transformedAsset = {
+            contract: {
+              name: null,
+              description: asset.description,
+              type: null,
+              size: null,
+              url: asset.url,
+              width: asset.width,
+              height: asset.height,
+            },
+            name: null,
+            type: null,
+            size: null,
+            description: asset.description,
+            url: asset.url,
+            width: asset.width,
+            height: asset.height,
+            id: asset.url
+          };
+
+          this.logger.log('Creating Gridsome node for asset from rich text field %o', transformedAsset);
+
+          assetCollection.addNode(transformedAsset);
+        }
+      }
     }
   }
 

@@ -99,7 +99,8 @@ class GridsomeContentItem extends ContentItem {
       },
       assetFields: [],
       linkedItemFields: [],
-      taxonomyFields: []
+      taxonomyFields: [],
+      richTextFields: []
     };
 
     return node;
@@ -194,6 +195,13 @@ class GridsomeContentItem extends ContentItem {
   richTextTypeFieldResolver(node, field) {
     const fieldName = field.fieldName;
     const html = this.richTextHtmlTransformer.transformRichTextHtml(field);
+
+    const richTextField = {
+      fieldName,
+      assets: field.images
+    };
+    
+    node.richTextFields.push(richTextField);
 
     this.addField(node, fieldName, html);
   }
